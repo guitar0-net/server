@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Ruff lint
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install PDM
+        run: pip install pdm
+
+      - name: Cache PDM packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            __pypackages__/
+            .pdm.toml
+          key: ${{ runner.os }}-pdm-${{ hashFiles('pdm.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pdm-
+
+      - name: PDM install
+        run: pdm install --frozen-lockfile
+
+      - name: Ruff — lint checks
+        run: pdm run ruff check .
+
+  typecheck:
+    name: Mypy type checking
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: "dummy-secret-key"
+      DATABASE_URL: "sqlite:///test.db"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PDM
+        run: pip install pdm
+
+      - name: Cache PDM packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            __pypackages__/
+            .pdm.toml
+          key: ${{ runner.os }}-pdm-${{ hashFiles('pdm.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pdm-
+
+      - name: Install dependencies
+        run: pdm install --frozen-lockfile
+
+      - name: Run MyPy
+        run: pdm run mypy --strict .
+
+  tests:
+    name: Pytest + Coverage
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: "dummy-secret-key"
+      DATABASE_URL: "sqlite:///test.db"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PDM
+        run: pip install pdm
+
+      - name: Cache PDM packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            __pypackages__/
+            .pdm.toml
+          key: ${{ runner.os }}-pdm-${{ hashFiles('pdm.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pdm-
+
+      - name: Install dependencies
+        run: pdm install --frozen-lockfile
+
+      - name: Run tests with coverage
+        run: pdm run pytest --maxfail=1 --cov --cov-branch --cov-report=xml --cov-fail-under=100
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: guitar0-net/server
