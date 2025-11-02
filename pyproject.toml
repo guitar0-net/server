@@ -1,0 +1,134 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "guitar0-server"
+version = "1.0.0"
+description = "API Server for the mobile and the web clients"
+authors = [
+    {name = "Andrey Kotlyar", email = "kotlyar562@gmail.com"},
+]
+dependencies = [
+    "Django==5.2.7",
+    "djangorestframework>=3.16.0,<3.17",
+    "pydantic-settings>=2.11.0",
+    "dj-database-url>=3.0.1",
+    "psycopg[binary]>=3.2,<3.3",
+    "pydantic>=2.12.3",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "AGPL-3.0"}
+
+[project.optional-dependencies]
+dev = [
+    "django-debug-toolbar>=6.0.0",
+    "pre-commit>=4.3.0",
+    "ruff>=0.14.2",
+    "mypy>=1.18.2",
+    "django-stubs>=5.2.7,<5.3",
+    "django-stubs-ext>=5.2.7,<5.3",
+    "djangorestframework-stubs>=3.16,<3.17",
+    "commitizen>=4.9.1",
+]
+test = [
+    "pytest>=8.4.2",
+    "pytest-django>=4.11.1",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+    "factory-boy>=3.3.3",
+    "model-bakery>=1.20.5",
+    "faker>=37.12.0",
+    "coverage[toml]>=7.6.0",
+]
+lint = [
+    "ruff>=0.14.2",
+    "mypy>=1.18.2",
+]
+
+
+[tool.mypy]
+python_version = "3.12"
+plugins = [
+    "pydantic.mypy",
+    "mypy_django_plugin.main",
+    "mypy_drf_plugin.main",
+]
+strict = true
+ignore_missing_imports = true
+warn_unused_configs = true
+warn_return_any = true
+warn_unreachable = true
+show_error_codes = true
+
+[tool.django-stubs]
+dj_version = "5.2"
+django_settings_module = "config.settings"
+warn_unused_configs = true
+show_error_codes = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+fix = true
+extend-exclude = ["migrations"]
+preview = true
+
+[tool.ruff.lint]
+extend-select = [
+    "E", "W", "F", "I", "B", "N",
+    "C4", "UP", "PL", "DJ",
+    "ANN", "SIM", "T10", "DTZ", "RUF"
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+skip-magic-trailing-comma = false
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.pdm]
+distribution = false
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py", "*_test.py"]
+addopts = """
+    --maxfail=1
+    -ra
+    -v
+    --disable-warnings
+    --strict-markers
+    --strict-config
+    --cov
+    --cov-fail-under=100
+    --cov-report=term-missing
+    --no-migrations
+"""
+testpaths = ["tests"]
+markers = ["integration"]
+filterwarnings = ["ignore:directory \"/run/secrets\" does not exist:UserWarning",]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+parallel = true
+omit = ["*/migrations/*", "*/tests/*", "manage.py"]
+
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "1.0.0"
+tag_format = "v$version"
+version_files = ["pyproject.toml"]
+
+[tool.pdm.scripts]
+setup = "pdm install --group dev --group test --group lint"
+lint = "python scripts/lint.py"

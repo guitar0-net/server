@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.python-version
+env/
+venv/
+.venv/
+.env.*
+.tox
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+*.log
+.mypy_cache
+.dmypy.json
+.pytest_cache
+
+# Django
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# PDM
+.pdm-build/
+.pdm-python
+
+# ruff
+.ruff_cache
+
+# other
+.vscode
+.DS_Store
