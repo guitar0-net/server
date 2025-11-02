@@ -12,7 +12,9 @@ def env_file(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> Generator[Path, None, None]:
-    env_path = tmp_path / ".env.dev"
+    for var in ["SECRET_KEY", "DATABASE_URL", "DEBUG", "ENVIRONMENT", "ALLOWED_HOSTS"]:
+        monkeypatch.delenv(var, raising=False)
+    env_path = tmp_path / ".env.development"
     env_path.write_text(
         "\n".join([
             "SECRET_KEY=secret-key",
@@ -35,7 +37,11 @@ def test_settings_load_from_env(env_file: Path) -> None:
     assert "localhost" in settings.ALLOWED_HOSTS
 
 
-def test_settings_required_fields_missing(tmp_path: Path) -> None:
+def test_settings_required_fields_missing(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    for var in ["SECRET_KEY", "DATABASE_URL", "DEBUG", "ENVIRONMENT", "ALLOWED_HOSTS"]:
+        monkeypatch.delenv(var, raising=False)
     env_path = tmp_path / ".env"
     env_path.write_text("Debug=False")
     with pytest.raises(ValidationError):
@@ -43,6 +49,8 @@ def test_settings_required_fields_missing(tmp_path: Path) -> None:
 
 
 def test_env_file_priority(monkeypatch: pytest.MonkeyPatch, env_file: Path) -> None:
+    for var in ["SECRET_KEY", "DATABASE_URL", "DEBUG", "ENVIRONMENT", "ALLOWED_HOSTS"]:
+        monkeypatch.delenv(var, raising=False)
     monkeypatch.setenv("SECRET_KEY", "environment-secret-key")
     settings = Settings(_env_file=env_file)  # pyright: ignore[reportCallIssue]
     assert settings.SECRET_KEY == "environment-secret-key"
