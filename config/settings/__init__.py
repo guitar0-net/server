@@ -2,13 +2,18 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import os
 from pathlib import Path
 
 import dj_database_url
 
+from config.settings.logging import get_logging_config
+
 from .base import get_settings
 
 settings = get_settings()
+LOGGING = get_logging_config(settings)
+os.makedirs(settings.LOG_FILE_PATH.parent, exist_ok=True)
 
 SECRET_KEY = settings.SECRET_KEY
 DEBUG = settings.DEBUG

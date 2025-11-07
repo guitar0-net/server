@@ -18,6 +18,7 @@ class _TemplateBackend(TypedDict):
 
 class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
+    LOG_FILE_PATH: Path = BASE_DIR / "logs" / "django.log"
     ENVIRONMENT: Literal["development", "staging", "production"] = "development"
 
     SECRET_KEY: str
