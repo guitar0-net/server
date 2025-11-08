@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2025 Andrey Kotlyar
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+codecov:
+  require_ci_to_pass: yes
+  notify:
+    wait_for_ci: yes
+    after_n_builds: 1
+
+coverage:
+  precision: 2
+  round: down
+  status:
+    project:
+      default:
+        target: 100%
+        threshold: 0%
+        base: auto
+        branches:
+          - main
+        if_ci_failed: error
+    patch:
+      default:
+        target: 100%
+        threshold: 0%
+    changes: off
+
+comment: off
