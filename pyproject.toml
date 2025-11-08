@@ -82,10 +82,15 @@ preview = true
 
 [tool.ruff.lint]
 extend-select = [
-    "E", "W", "F", "I", "B", "N",
+    "E", "W", "F", "I", "B", "N", "D",
     "C4", "UP", "PL", "DJ",
     "ANN", "SIM", "T10", "DTZ", "RUF"
 ]
+ignore = ["D203", "D213", "D406", "D407", "D413",
+          "RUF002"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D100", "D101", "D102", "D103"]
 
 [tool.ruff.format]
 quote-style = "double"

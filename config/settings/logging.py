@@ -2,6 +2,21 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+"""Logging configuration for the Django project.
+
+This module defines the centralized logging setup used across the application.
+It includes handlers, formatters, filters, and loggers configuration.
+
+The configuration ensures that:
+- Logs are written both to the console (for development) and to rotating files.
+- Sensitive information is filtered out before being written to logs.
+- Critical errors are automatically emailed to administrators in production.
+
+Functions:
+    get_logging_config(settings: Settings) -> LoggingConfig:
+        Returns the full logging configuration dictionary for Django.
+"""
+
 from typing import Literal, TypedDict
 
 from .base import Settings
@@ -39,6 +54,12 @@ class _Logger(TypedDict):
 
 
 class LoggingConfig(TypedDict):
+    """TypedDict defining the structure of the Django logging configuration.
+
+    Specifies the expected keys and value types for handlers, formatters,
+    filters, and loggers used in the application's logging system.
+    """
+
     version: int
     disable_existing_loggers: bool
     formatters: dict[str, _Formatter]
@@ -48,6 +69,17 @@ class LoggingConfig(TypedDict):
 
 
 def get_logging_config(settings: Settings) -> LoggingConfig:
+    """Return the logging configuration dictionary for Django.
+
+    Builds and returns a structured logging configuration based on
+    project settings.
+
+    Args:
+        settings (Settings): The project settings instance.
+
+    Returns:
+        LoggingConfig: The complete Django logging configuration dictionary.
+    """
     base_logging: LoggingConfig = {
         "version": 1,
         "disable_existing_loggers": False,

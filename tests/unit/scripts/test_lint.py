@@ -16,8 +16,7 @@ type MockRun = list[list[str]]
 
 @pytest.fixture
 def mock_run(monkeypatch: pytest.MonkeyPatch) -> Generator[MockRun, None, None]:
-    """Мок subprocess.run"""
-
+    """Мок subprocess.run."""
     calls: MockRun = []
 
     def fake_run(command: list[str], check: bool) -> None:
@@ -56,7 +55,6 @@ def test_run_command_failure(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_main_invokes_both_linters(mock_run: MockRun) -> None:
     """Проверяет, что main вызывает Ruff и Mypy в нужном порядке."""
-
     expected_amount_of_calls = 3
     lint.main()
 

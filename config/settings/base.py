@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+"""Django configuration with typing."""
+
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal, TypedDict
@@ -17,6 +19,16 @@ class _TemplateBackend(TypedDict):
 
 
 class Settings(BaseSettings):
+    """Base configuration class.
+
+    Inherits from `pydantic_settings.BaseSettings` to automatically
+    load values from environment variables.
+
+    Args:
+        BaseSettings (class): Parent class that provides functionality
+            for working with environment variables.
+    """
+
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
     LOG_FILE_PATH: Path = BASE_DIR / "logs" / "django.log"
     ENVIRONMENT: Literal["development", "staging", "production"] = "development"
@@ -54,4 +66,12 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
+    """Retrieve the project settings.
+
+    Uses caching to ensure that the settings class is loaded only once
+    during the application's lifetime.
+
+    Returns:
+        Settings: The base configuration class for the project.
+    """
     return Settings()  # pyright: ignore[reportCallIssue]

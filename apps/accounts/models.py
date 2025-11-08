@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Create your models here.
+"""Models for the Accounts Django app."""

@@ -12,8 +12,7 @@ import pytest
 def test_run_module_executes_main(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Интеграционный тест scripts/lint.py"""
-
+    """Integrity test scripts/lint.py."""
     script_path = Path(__file__).resolve().parents[3] / "scripts" / "lint.py"
 
     runpy.run_path(str(script_path), run_name="__main__")

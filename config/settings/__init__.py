@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+"""Initialize settings and configure derived attributes."""
+
 import os
 from pathlib import Path
 

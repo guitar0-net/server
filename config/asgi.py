@@ -2,8 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""
-ASGI config for config project.
+"""ASGI config for config project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
