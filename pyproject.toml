@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 Andrey Kotlyar
+# SPDX-FileCopyrightText: 2025 Andrey Kotlyar <guitar0.app@gmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -8,7 +8,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "guitar0-server"
-version = "1.0.0"
+version = "0.0.1"
 description = "API Server for the mobile and the web clients"
 authors = [
     {name = "Andrey Kotlyar", email = "kotlyar562@gmail.com"},
@@ -47,10 +47,6 @@ test = [
     "faker>=37.12.0",
     "coverage[toml]>=7.11.0",
 ]
-lint = [
-    "ruff>=0.14.3",
-    "mypy>=1.18.2",
-]
 
 
 [tool.mypy]
@@ -61,14 +57,13 @@ plugins = [
     "mypy_drf_plugin.main",
 ]
 strict = true
-ignore_missing_imports = true
+ignore_missing_imports = false
 warn_unused_configs = true
 warn_return_any = true
 warn_unreachable = true
 show_error_codes = true
 
 [tool.django-stubs]
-dj_version = "5.2"
 django_settings_module = "config.settings"
 warn_unused_configs = true
 show_error_codes = true
@@ -88,9 +83,10 @@ extend-select = [
 ]
 ignore = ["D203", "D213", "D406", "D407", "D413",
           "RUF002"]
+unfixable = ["F401"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D100", "D101", "D102", "D103"]
+"**/tests/*" = ["D100", "D101", "D102", "D103"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -143,4 +139,7 @@ version_files = ["pyproject.toml"]
 setup = "pdm install --group dev --group test --group lint"
 lint = "python scripts/lint.py"
 license-check = "reuse lint"
-license-add = "reuse annotate --recursive . --skip-unrecognised --copyright 'Andrey Kotlyar' --license AGPL-3.0-or-later"
+license-add = """reuse annotate --recursive .
+--skip-unrecognised
+--copyright 'Andrey Kotlyar <guitar0.app@gmail.com>'
+--license AGPL-3.0-or-later"""
