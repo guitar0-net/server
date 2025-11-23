@@ -109,11 +109,15 @@ jobs:
       - name: Install dependencies
         run: pdm install --frozen-lockfile
 
-      - name: Run tests with coverage
-        run: pdm run pytest --maxfail=1 --cov --cov-branch --cov-report=xml --cov-fail-under=90
+      - name: Run unit tests
+        run: pdm run pytest --maxfail=1 --cov --cov-branch --cov-report=xml --cov-fail-under=90 -m "not integration"
+
+      - name: Run integration tests
+        run: pdm run pytest --maxfail=1 --cov --cov-branch --cov-report=xml --cov-append -m "integration"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: guitar0-net/server
+          files: coverage.xml
