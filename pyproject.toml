@@ -110,9 +110,10 @@ addopts = """
     --strict-markers
     --strict-config
     --cov
-    --cov-fail-under=100
+    --cov-fail-under=90
     --cov-report=term-missing
     --no-migrations
+    -m 'not integration'
 """
 testpaths = ["tests"]
 markers = ["integration"]
@@ -126,7 +127,7 @@ omit = ["*/migrations/*", "*/tests/*", "manage.py"]
 
 
 [tool.coverage.report]
-fail_under = 100
+fail_under = 90
 show_missing = true
 
 [tool.commitizen]

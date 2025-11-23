@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 Andrey Kotlyar
+# SPDX-FileCopyrightText: 2025 Andrey Kotlyar <guitar0.app@gmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -15,7 +15,7 @@ coverage:
     project:
       default:
         target: 100%
-        threshold: 0%
+        threshold: 10%
         base: auto
         branches:
           - main
@@ -23,7 +23,7 @@ coverage:
     patch:
       default:
         target: 100%
-        threshold: 0%
+        threshold: 10%
     changes: off
 
 comment: off

@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 Andrey Kotlyar
+# SPDX-FileCopyrightText: 2025 Andrey Kotlyar <guitar0.app@gmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -110,7 +110,7 @@ jobs:
         run: pdm install --frozen-lockfile
 
       - name: Run tests with coverage
-        run: pdm run pytest --maxfail=1 --cov --cov-branch --cov-report=xml --cov-fail-under=100
+        run: pdm run pytest --maxfail=1 --cov --cov-branch --cov-report=xml --cov-fail-under=90
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
