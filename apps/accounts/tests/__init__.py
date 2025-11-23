@@ -2,6 +2,4 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Models for the Accounts Django app."""
-
-from .user import User
+"""Tests for the accounts app."""

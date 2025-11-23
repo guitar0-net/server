@@ -2,6 +2,5 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Models for the Accounts Django app."""
 
-from .user import User
+"""Factories for the testing the accounts module."""

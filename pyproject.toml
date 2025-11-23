@@ -81,12 +81,13 @@ extend-select = [
     "C4", "UP", "PL", "DJ",
     "ANN", "SIM", "T10", "DTZ", "RUF"
 ]
-ignore = ["D203", "D213", "D406", "D407", "D413",
-          "RUF002"]
-unfixable = ["F401"]
+ignore = ["D203", "D213", "D406", "D407", "D413", # docs black lines, etc.
+          "RUF002"]     # every import on a new line
+unfixable = ["F401"] # don't remove import without using
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/*" = ["D100", "D101", "D102", "D103"]
+"**/tests/*" = ["D100", "D101", "D102", "D103"] # test files and functions without docs
+"__init__.py" = ["F401"] # imports without using in init files
 
 [tool.ruff.format]
 quote-style = "double"
@@ -106,7 +107,6 @@ addopts = """
     --maxfail=1
     -ra
     -v
-    --disable-warnings
     --strict-markers
     --strict-config
     --cov
@@ -115,7 +115,7 @@ addopts = """
     --no-migrations
     -m 'not integration'
 """
-testpaths = ["tests"]
+testpaths = ["tests", "apps"]
 markers = ["integration"]
 filterwarnings = ["ignore:directory \"/run/secrets\" does not exist:UserWarning",]
 

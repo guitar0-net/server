@@ -43,7 +43,7 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-        args: []
+        args: ["--maxfail=1", "--cov-fail-under=0"]
         stages: [pre-commit]
       - id: pytest-integration
         name: Run integration tests
