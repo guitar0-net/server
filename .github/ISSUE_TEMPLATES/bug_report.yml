@@ -1,0 +1,65 @@
+# SPDX-FileCopyrightText: 2025 Andrey Kotlyar <guitar0.app@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: Bug Report
+description: Сообщение об ошибке
+title: "[Bug]: "
+labels: ["type:bug"]
+assignees: ["Ваше имя"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за багрепорт! Пожалуйста, опишите ошибку как можно более подробно.
+  - type: textarea
+    id: description
+    attributes:
+      label: Описание
+      description: Понятное и подробное описание ошибки
+      placeholder: "Опишите, что произошло, и почему считаете это ошибкой."
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Шаги для воспроизведения
+      description: Укажите шаги, которые ведут к появлению ошибки
+      placeholder: |
+        1. Переходим к '...'
+        2. Нажимаем на '....'
+        3. Видим ошибку
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Ожидаемое поведение
+      description: Что должно было произойти
+      placeholder: "Опишите, как должно было работать, если всё правильно."
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Фактическое поведение
+      description: Что произошло на самом деле, включая сообщение об ошибке и логи
+      placeholder: "Сообщение об ошибке, стектрейс, поведение системы."
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Окружение
+      description: Версия Python, Django, база данных, ОС и другое важное окружение
+      placeholder: "Python 3.12, Django 5.2, PostgreSQL 16, macOS Ventura"
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Related Tests
+      description: Ссылки на тесты, которые затрагиваются, или предложения новых тестов
+      placeholder: "Например, tests/test_views.py"
+    validations:
+      required: false

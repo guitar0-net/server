@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: 2025 Andrey Kotlyar <guitar0.app@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: Feature Request
+description: Предложение новой функциональности
+title: "[Feature]: "
+labels: ["type:feature"]
+assignees: ["Ваше имя"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за предложение! Пожалуйста, опишите функциональность максимально подробно.
+  - type: input
+    id: summary
+    attributes:
+      label: Краткое описание
+      description: Одно-два предложения о сути функции
+    validations:
+      required: true
+  - type: textarea
+    id: detailed-description
+    attributes:
+      label: Подробное описание
+      description: Подробно опишите, как должна работать новая функциональность
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Зачем это нужно
+      description: Объясните, какие проблемы решает эта функция или какие улучшения даст
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Примеры использования
+      description: Примеры сценариев использования или желаемый результат
