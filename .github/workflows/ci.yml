@@ -24,25 +24,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Set up PDM with cache
+        uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: true
+          cache-dependency-path: |
+            pdm.lock
+            pyproject.toml
 
-      - name: Install PDM
-        run: pip install pdm
-
-      - name: Cache PDM packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            __pypackages__/
-            .pdm.toml
-          key: ${{ runner.os }}-pdm-${{ matrix.python-version }}-${{ hashFiles('pdm.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pdm-${{ matrix.python-version }}-
-
-      - name: PDM install
+      - name: Install dependencies
         run: pdm install --frozen-lockfile
 
       - name: Ruff — lint checks
@@ -60,23 +51,17 @@ jobs:
       DATABASE_URL: "sqlite:///test.db"
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PDM with cache
+        uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install PDM
-        run: pip install pdm
-
-      - name: Cache PDM packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            __pypackages__/
-            .pdm.toml
-          key: ${{ runner.os }}-pdm-${{ matrix.python-version }}-${{ hashFiles('pdm.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pdm-${{ matrix.python-version }}-
+          cache: true
+          cache-dependency-path: |
+            pdm.lock
+            pyproject.toml
 
       - name: Install dependencies
         run: pdm install --frozen-lockfile
@@ -96,23 +81,17 @@ jobs:
       DATABASE_URL: "sqlite:///test.db"
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PDM with cache
+        uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install PDM
-        run: pip install pdm
-
-      - name: Cache PDM packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            __pypackages__/
-            .pdm.toml
-          key: ${{ runner.os }}-pdm-${{ matrix.python-version }}-${{ hashFiles('pdm.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pdm-${{ matrix.python-version }}-
+          cache: true
+          cache-dependency-path: |
+            pdm.lock
+            pyproject.toml
 
       - name: Install dependencies
         run: pdm install --frozen-lockfile
