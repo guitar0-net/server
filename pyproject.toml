@@ -63,6 +63,10 @@ warn_return_any = true
 warn_unreachable = true
 show_error_codes = true
 
+[[tool.mypy.overrides]]
+module = "apps.*.tests.factories"
+ignore_errors = true
+
 [tool.django-stubs]
 django_settings_module = "config.settings"
 warn_unused_configs = true
@@ -81,12 +85,17 @@ extend-select = [
     "C4", "UP", "PL", "DJ",
     "ANN", "SIM", "T10", "DTZ", "RUF"
 ]
-ignore = ["D203", "D213", "D406", "D407", "D413", # docs black lines, etc.
-          "RUF002"]     # every import on a new line
+ignore = [
+    "D203", "D213", "D406", "D407", "D413", # docs black lines, etc.
+    "RUF001", # every import on a new line
+    "RUF002"  # cyrillic symbols, which have the same view, as latin
+]
 unfixable = ["F401"] # don't remove import without using
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*" = ["D100", "D101", "D102", "D103"] # test files and functions without docs
+"**/models.py" = ["D106", "D105"] # docstring in nested classes (Meta), doc for __str__
+"**/factories.py" = ["D106"]
 "__init__.py" = ["F401"] # imports without using in init files
 
 [tool.ruff.format]

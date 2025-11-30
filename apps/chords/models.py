@@ -4,6 +4,47 @@
 
 """Models for the chords app."""
 
-from django.db import models  # noqa: F401
+from typing import ClassVar
 
-# Create your models here.
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+
+
+class Chord(models.Model):
+    """Main model for saving information about guitar chords."""
+
+    title = models.CharField("Название", max_length=50)
+    musical_title = models.CharField("Музыкальное название", max_length=50)
+    order_in_note = models.PositiveSmallIntegerField("Порядок отображения", default=1)
+    start_fret = models.PositiveSmallIntegerField("С какого лада начинается", default=1)
+    has_barre = models.BooleanField("Есть барре?", default=False)
+
+    def __str__(self) -> str:
+        return self.title if not self.has_barre else f"{self.title} bare"
+
+
+class ChordPosition(models.Model):
+    """Model for describing position of one string in a chord."""
+
+    chord = models.ForeignKey(Chord, related_name="positions", on_delete=models.CASCADE)
+    string_number = models.PositiveSmallIntegerField(
+        verbose_name="Номер струны",
+        validators=[MinValueValidator(1), MaxValueValidator(6)],
+    )
+    fret = models.SmallIntegerField(verbose_name="На каком ладу зажата")
+    finger = models.SmallIntegerField(
+        verbose_name="Каким пальцем зажата",
+        validators=[MinValueValidator(-1), MaxValueValidator(4)],
+    )
+
+    class Meta:
+        constraints: ClassVar[list] = [  # type: ignore[type-arg]
+            models.UniqueConstraint(
+                fields=["chord", "string_number"],
+                name="unique_chord_string_number",
+            )
+        ]
+        ordering: ClassVar[list[str]] = ["string_number"]
+
+    def __str__(self) -> str:
+        return f"String #{self.string_number}: fret {self.fret}, finger {self.finger}"
