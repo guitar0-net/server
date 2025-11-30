@@ -9,6 +9,15 @@ from typing import ClassVar
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from apps.chords.constants import (
+    MAX_FINGER,
+    MAX_FRET,
+    MAX_STRING_NUMBER,
+    MIN_FINGER,
+    MIN_FRET,
+    MIN_STRING_NUMBER,
+)
+
 
 class Chord(models.Model):
     """Main model for saving information about guitar chords."""
@@ -29,12 +38,25 @@ class ChordPosition(models.Model):
     chord = models.ForeignKey(Chord, related_name="positions", on_delete=models.CASCADE)
     string_number = models.PositiveSmallIntegerField(
         verbose_name="Номер струны",
-        validators=[MinValueValidator(1), MaxValueValidator(6)],
+        validators=[
+            MinValueValidator(MIN_STRING_NUMBER),
+            MaxValueValidator(MAX_STRING_NUMBER),
+        ],
     )
-    fret = models.SmallIntegerField(verbose_name="На каком ладу зажата")
+    fret = models.SmallIntegerField(
+        verbose_name="На каком ладу зажата",
+        validators=[
+            MinValueValidator(MIN_FRET),
+            MaxValueValidator(MAX_FRET),
+        ],
+        help_text="0 - открыта, -1 - заглушена",
+    )
     finger = models.SmallIntegerField(
         verbose_name="Каким пальцем зажата",
-        validators=[MinValueValidator(-1), MaxValueValidator(4)],
+        validators=[
+            MinValueValidator(MIN_FINGER),
+            MaxValueValidator(MAX_FINGER),
+        ],
     )
 
     class Meta:

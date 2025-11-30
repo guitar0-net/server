@@ -93,9 +93,10 @@ ignore = [
 unfixable = ["F401"] # don't remove import without using
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/*" = ["D100", "D101", "D102", "D103"] # test files and functions without docs
+"**/tests/*" = ["D100", "D101", "D102", "D103", "PLR2004"] # test files and functions without docs; numbers without constants
 "**/models.py" = ["D106", "D105"] # docstring in nested classes (Meta), doc for __str__
 "**/factories.py" = ["D106"]
+"**/serializers.py" = ["D106"]
 "__init__.py" = ["F401"] # imports without using in init files
 
 [tool.ruff.format]

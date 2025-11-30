@@ -6,6 +6,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 
+from apps.chords.constants import MAX_FINGER, MAX_STRING_NUMBER
 from apps.chords.models import Chord, ChordPosition
 from apps.chords.tests.factories import ChordFactory, ChordPositionFactory
 
@@ -39,11 +40,11 @@ def test_string_number_validation(chord: Chord) -> None:
     with pytest.raises(ValidationError):
         position.full_clean()
 
-    position.string_number = 7
+    position.string_number = MAX_STRING_NUMBER + 1
     with pytest.raises(ValidationError):
         position.full_clean()
 
-    for i in range(1, 6 + 1):
+    for i in range(1, MAX_STRING_NUMBER + 1):
         pos = ChordPosition(chord=chord, string_number=i, fret=1, finger=1)
         pos.full_clean()
 
@@ -54,11 +55,11 @@ def test_finger_validation(chord: Chord) -> None:
     with pytest.raises(ValidationError):
         position.full_clean()
 
-    position.finger = 5
+    position.finger = MAX_FINGER + 1
     with pytest.raises(ValidationError):
         position.full_clean()
 
-    for f in range(-1, 4 + 1):
+    for f in range(0, MAX_FINGER + 1):
         pos = ChordPosition(chord=chord, string_number=1, fret=1, finger=f)
         pos.full_clean()
 
