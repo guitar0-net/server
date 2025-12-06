@@ -6,6 +6,7 @@
 
 from rest_framework import serializers
 
+from apps.chords.constants import MAX_STRING_NUMBER
 from apps.chords.models import Chord, ChordPosition
 
 
@@ -41,6 +42,8 @@ class ChordCreateUpdateSerializer(serializers.ModelSerializer[Chord]):
             raise serializers.ValidationError(
                 "Duplicate string numbers are not allowed."
             )
+        if len(value) != MAX_STRING_NUMBER:
+            raise serializers.ValidationError("Chord must has only 6 positions.")
         return value
 
 

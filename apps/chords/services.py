@@ -8,6 +8,7 @@ from typing import Any, TypedDict
 
 from django.db import transaction
 
+from .constants import MAX_STRING_NUMBER
 from .models import Chord, ChordPosition
 
 
@@ -59,6 +60,9 @@ class ChordService:
         Returns:
             Chord: The created Chord instance.
         """
+        if len(positions) != MAX_STRING_NUMBER:
+            raise ValueError("Chord must have exactly 6 positions")
+
         chord = Chord.objects.create(**chord_fields)
         ChordService._replace_positions(chord, positions)
         return chord
@@ -80,6 +84,9 @@ class ChordService:
             Chord: The updated Chord instance.
         """
         positions_data = data.pop("positions", None)
+        if positions_data is not None and len(positions_data) != MAX_STRING_NUMBER:
+            raise ValueError("Chord must have exactly 6 positions")
+
         for field, value in data.items():
             setattr(chord, field, value)
         chord.save()

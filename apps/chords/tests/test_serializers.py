@@ -57,8 +57,27 @@ def invalid_duplicate_positions_data() -> dict[str, Any]:
         "start_fret": 1,
         "has_barre": False,
         "positions": [
+            {"string_number": 1, "fret": 0, "finger": 0},
+            {"string_number": 1, "fret": 1, "finger": 1},
+            {"string_number": 3, "fret": 2, "finger": 3},
+            {"string_number": 4, "fret": 2, "finger": 2},
+            {"string_number": 5, "fret": 0, "finger": 0},
+            {"string_number": 6, "fret": 0, "finger": 0},
+        ],
+    }
+
+
+@pytest.fixture
+def invalid_not_enough_positions_data() -> dict[str, Any]:
+    return {
+        "title": "Invalid Chord",
+        "musical_title": "Invalid",
+        "order_in_note": 1,
+        "start_fret": 1,
+        "has_barre": False,
+        "positions": [
             {"string_number": 6, "fret": 5, "finger": 1},
-            {"string_number": 6, "fret": 7, "finger": 3},
+            {"string_number": 1, "fret": 7, "finger": 3},
         ],
     }
 
@@ -176,6 +195,16 @@ def test_chord_create_serializer_invalid_duplicate_positions(
     assert (
         "Duplicate string numbers are not allowed." in serializer.errors["positions"][0]
     )
+
+
+@pytest.mark.django_db
+def test_chord_create_serializer_invalid_not_enough_positions(
+    invalid_not_enough_positions_data: dict[str, Any],
+) -> None:
+    serializer = ChordCreateUpdateSerializer(data=invalid_not_enough_positions_data)
+    assert serializer.is_valid() is False
+    assert "positions" in serializer.errors
+    assert "Chord must has only 6 positions." in serializer.errors["positions"][0]
 
 
 @pytest.mark.django_db
