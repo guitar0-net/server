@@ -2,9 +2,4 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-
-"""Views for the chords app."""
-
-from django.shortcuts import render  # noqa: F401
-
-# Create your views here.
+"""Api views and urls for the chords app."""
