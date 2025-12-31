@@ -7,6 +7,11 @@ from typing import Any
 import pytest
 from rest_framework.serializers import ValidationError
 
+from apps.chords.api.serializers import (
+    ChordCreateUpdateSerializer,
+    ChordOutputSerializer,
+    ChordPositionSerializer,
+)
 from apps.chords.constants import (
     MAX_FINGER,
     MAX_FRET,
@@ -16,11 +21,6 @@ from apps.chords.constants import (
     MIN_STRING_NUMBER,
 )
 from apps.chords.models import Chord, ChordPosition
-from apps.chords.serializers import (
-    ChordCreateUpdateSerializer,
-    ChordOutputSerializer,
-    ChordPositionSerializer,
-)
 from apps.chords.tests.factories import FullChordFactory
 
 

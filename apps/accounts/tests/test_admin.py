@@ -75,11 +75,11 @@ def test_model_registration(admin_site: admin.AdminSite) -> None:
 
 @pytest.mark.django_db
 def test_admin_list_view_access_user(
-    user: User,
+    common_user: User,
 ) -> None:
     factory = RequestFactory()
     request = factory.get(reverse("admin:accounts_user_changelist"))
-    request.user = user
+    request.user = common_user
     with pytest.raises(PermissionDenied):
         _ = UserAdmin(User, admin.site).changelist_view(request)
 
