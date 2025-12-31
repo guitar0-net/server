@@ -2,12 +2,11 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Pytest configuration and fixtures for accounts tests.
-
-This file defines shared fixtures for use across test modules.
-"""
+"""Global pytest fixtures ."""
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
+from rest_framework.test import APIRequestFactory
 
 from apps.accounts.models.user import User
 from apps.accounts.tests.factories.user import UserFactory
@@ -24,7 +23,7 @@ def user_factory() -> type[UserFactory]:
 
 
 @pytest.fixture
-def user(user_factory: type[UserFactory]) -> User:
+def common_user(user_factory: type[UserFactory]) -> User:
     """Fixture creating a common user for testing.
 
     Returns:
@@ -33,6 +32,20 @@ def user(user_factory: type[UserFactory]) -> User:
     return user_factory.create(
         is_superuser=False,
         is_staff=False,
+        password="password",
+    )
+
+
+@pytest.fixture
+def staff_user(user_factory: type[UserFactory]) -> User:
+    """Fixture creating a common user for testing.
+
+    Returns:
+        User: A user instance.
+    """
+    return user_factory.create(
+        is_superuser=False,
+        is_staff=True,
         password="password",
     )
 
@@ -50,3 +63,23 @@ def superuser(user_factory: type[UserFactory]) -> User:
         email="admin@example.com",
         password="password123",
     )
+
+
+@pytest.fixture
+def anonymous_user() -> AnonymousUser:
+    """Fixture creating an anonymous user for testing.
+
+    Returns:
+        AnonymousUser: An anonymous user instance (not authenticated).
+    """
+    return AnonymousUser()
+
+
+@pytest.fixture
+def api_request_factory() -> APIRequestFactory:
+    """Fixture providing APIRequestFactory for creating mock requests.
+
+    Returns:
+        APIRequestFactory instance for creating test requests.
+    """
+    return APIRequestFactory()
