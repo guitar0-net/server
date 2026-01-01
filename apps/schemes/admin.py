@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 
-"""Guitar image schemes module."""
+"""Admin settings for schemes."""

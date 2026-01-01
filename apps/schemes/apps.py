@@ -2,13 +2,13 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""App configuration for the image schemes application."""
+"""App configuration for the schemes application."""
 
 from django.apps import AppConfig
 
 
-class ImageSchemesConfig(AppConfig):
-    """Configuration class for the image schemes Django app."""
+class SchemesConfig(AppConfig):
+    """Configuration class for the schemes Django app."""
 
     default_auto_field = "django.db.models.BigAutoField"
-    name = "image_schemes"
+    name = "apps.schemes"

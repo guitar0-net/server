@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 
-"""Models for the image schemes app."""
+"""Guitar schemes module."""

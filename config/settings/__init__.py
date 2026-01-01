@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.accounts",
     "apps.chords",
+    "apps.schemes",
 ]
 
 MIDDLEWARE = [

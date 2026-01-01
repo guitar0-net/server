@@ -2,5 +2,4 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-
-"""Admin settings for image schemes."""
+"""Tests for the schemes app."""
