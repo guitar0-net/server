@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 Andrey Kotlyar <guitar0.app@gmail.com>
+# SPDX-FileCopyrightText: 2025-2026 Andrey Kotlyar <guitar0.app@gmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -150,7 +150,12 @@ version_files = ["pyproject.toml"]
 setup = "pdm install --group dev --group test --group lint"
 lint = "python scripts/lint.py"
 license-check = "reuse lint"
-license-add = """reuse annotate --recursive .
---skip-unrecognised
---copyright 'Andrey Kotlyar <guitar0.app@gmail.com>'
---license AGPL-3.0-or-later"""
+license-add = """
+sh -c '
+git diff --cached --name-only --diff-filter=ACM |
+xargs reuse annotate \
+  --skip-unrecognised \
+  --copyright "Andrey Kotlyar <guitar0.app@gmail.com>" \
+  --license AGPL-3.0-or-later
+'
+"""
