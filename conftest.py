@@ -5,11 +5,42 @@
 """Global pytest fixtures ."""
 
 import pytest
+from django.contrib.admin import AdminSite, site
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.test import APIRequestFactory
 
 from apps.accounts.models.user import User
 from apps.accounts.tests.factories.user import UserFactory
+
+########################
+# Global Django instances
+########################
+
+
+@pytest.fixture
+def admin_site() -> AdminSite:
+    """Fixture providing the Admin site."""
+    return site
+
+
+########################
+# Global DRF instances
+########################
+
+
+@pytest.fixture
+def api_request_factory() -> APIRequestFactory:
+    """Fixture providing APIRequestFactory for creating mock requests.
+
+    Returns:
+        APIRequestFactory instance for creating test requests.
+    """
+    return APIRequestFactory()
+
+
+########################
+# User instances
+########################
 
 
 @pytest.fixture
@@ -73,13 +104,3 @@ def anonymous_user() -> AnonymousUser:
         AnonymousUser: An anonymous user instance (not authenticated).
     """
     return AnonymousUser()
-
-
-@pytest.fixture
-def api_request_factory() -> APIRequestFactory:
-    """Fixture providing APIRequestFactory for creating mock requests.
-
-    Returns:
-        APIRequestFactory instance for creating test requests.
-    """
-    return APIRequestFactory()

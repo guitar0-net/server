@@ -4,3 +4,15 @@
 
 
 """Admin settings for schemes."""
+
+from django.contrib import admin
+
+from apps.schemes.models import ImageScheme
+
+
+@admin.register(ImageScheme)
+class ImageSchemeAdmin(admin.ModelAdmin):  # type: ignore[type-arg]
+    """Admin interface for the ImageScheme model."""
+
+    list_display = ("code", "inscription", "image")
+    search_fields = ("code", "inscription")
