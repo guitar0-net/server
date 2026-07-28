@@ -6,6 +6,9 @@ import pytest
 from rest_framework.serializers import ValidationError
 
 from apps.chords.api.v1.serializers.chord_detail_serializer import ChordDetailSerializer
+from apps.chords.api.v1.serializers.chord_embedded_serializer import (
+    ChordEmbeddedSerializer,
+)
 from apps.chords.api.v1.serializers.chord_position_serializer import (
     ChordPositionSerializer,
 )
@@ -128,3 +131,11 @@ def test_chord_detail_serializer_read(db_chord_instance: Chord) -> None:
     assert data["has_barre"] is False
     assert "positions" in data
     assert len(data["positions"]) == 6
+
+
+@pytest.mark.django_db
+def test_chord_embedded_serializer_omits_positions(db_chord_instance: Chord) -> None:
+    serializer = ChordEmbeddedSerializer(db_chord_instance)
+    data = serializer.data
+
+    assert "positions" not in data

@@ -6,7 +6,9 @@
 
 from rest_framework import serializers
 
-from apps.chords.api.v1.serializers.chord_detail_serializer import ChordDetailSerializer
+from apps.chords.api.v1.serializers.chord_embedded_serializer import (
+    ChordEmbeddedSerializer,
+)
 from apps.schemes.api.v1.serializers.image_scheme_serializer import (
     ImageSchemeSerializer,
 )
@@ -16,7 +18,7 @@ from apps.songs.models import Song
 class SongDetailSerializer(serializers.ModelSerializer[Song]):
     """Song detail serializer."""
 
-    chords = ChordDetailSerializer(many=True, read_only=True)
+    chords = ChordEmbeddedSerializer(many=True, read_only=True)
     schemes = ImageSchemeSerializer(many=True, read_only=True)
 
     class Meta:
