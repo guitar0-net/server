@@ -52,3 +52,4 @@ def test_song_detail_serializer() -> None:
     chord_data = data["chords"][0]
     assert chord_data["id"] == chords[0].id
     assert chord_data["title"] == chords[0].title
+    assert "positions" not in chord_data

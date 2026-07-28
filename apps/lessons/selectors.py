@@ -41,7 +41,9 @@ def get_lesson_by_uuid(uuid: str) -> Lesson | None:
             "songs__schemes",
             Prefetch(
                 "addition_lessons",
-                queryset=Lesson.objects.filter(is_published=True),
+                queryset=Lesson.objects.filter(is_published=True).prefetch_related(
+                    "songs"
+                ),
             ),
         )
         .first()

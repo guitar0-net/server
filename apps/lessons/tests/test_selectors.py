@@ -5,6 +5,7 @@
 """Tests for lessons selectors."""
 
 import pytest
+from pytest_django.fixtures import DjangoAssertNumQueries
 
 from apps.courses.tests.factories import CourseFactory
 from apps.lessons.selectors import (
@@ -97,3 +98,17 @@ def test_get_lesson_by_uuid_filters_unpublished_addition_lessons() -> None:
     assert result is not None
     addition_titles = [lesson.title for lesson in result.addition_lessons.all()]
     assert addition_titles == ["Published"]
+
+
+@pytest.mark.django_db
+def test_get_lesson_by_uuid_prefetches_songs_of_addition_lessons(
+    django_assert_num_queries: DjangoAssertNumQueries,
+) -> None:
+    additions = LessonFactory.create_batch(3, songs=2)
+    lesson = LessonFactory.create(addition_lessons=additions)
+
+    with django_assert_num_queries(4):
+        result = get_lesson_by_uuid(str(lesson.uuid))
+        assert result is not None
+        for addition in result.addition_lessons.all():
+            list(addition.songs.all())
