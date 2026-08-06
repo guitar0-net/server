@@ -17,3 +17,10 @@ path = [
 precedence = "closest"
 SPDX-FileCopyrightText = "Andrey Kotlyar <guitar0.app@gmail.com>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = "apps/donations/certs/AppleRootCA-G3.cer"
+precedence = "closest"
+SPDX-FileCopyrightText = "Apple Inc."
+SPDX-License-Identifier = "CC0-1.0"
+SPDX-FileComment = "Public root certificate, downloaded verbatim from https://www.apple.com/certificateauthority/AppleRootCA-G3.cer; trust anchor for App Store Server API response verification."

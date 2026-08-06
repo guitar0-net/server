@@ -43,6 +43,15 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     GOOGLE_CLIENT_ID: str | None = None
 
+    GOOGLE_PLAY_PACKAGE_NAME: str | None = None
+    GOOGLE_PLAY_SERVICE_ACCOUNT_INFO: str | None = None
+
+    APPLE_BUNDLE_ID: str | None = None
+    # App Store Connect's numeric app id, required to verify a signed
+    # transaction was issued for *this* app once the client is talking about
+    # the Production environment.
+    APPLE_APP_APPLE_ID: int | None = None
+
     DEBUG: bool = False
     ALLOWED_HOSTS: list[str] = []
     CSRF_TRUSTED_ORIGINS: list[str] = []
