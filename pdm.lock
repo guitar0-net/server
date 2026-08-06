@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:71cf8678cf5051695e92c45c1059776efa263f872518d043750cb18cfda0d7bf"
+content_hash = "sha256:a9a707606bd57b32715dbb484841703ce20431c804a86e0fb0f8df22da1c1f54"
 
 [[metadata.targets]]
 requires_python = ">=3.14"
@@ -22,6 +22,26 @@ dependencies = [
 files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
+]
+
+[[package]]
+name = "app-store-server-library"
+version = "3.1.2"
+requires_python = "<4,>=3.7"
+summary = "The App Store Server Library"
+groups = ["default"]
+dependencies = [
+    "PyJWT<3,>=2.6.0",
+    "asn1==3.2.0",
+    "attrs>=21.3.0",
+    "cattrs>=23.1.2",
+    "cryptography>=43.0.0",
+    "pyOpenSSL>=23.1.1",
+    "requests<3,>=2.28.0",
+]
+files = [
+    {file = "app_store_server_library-3.1.2-py3-none-any.whl", hash = "sha256:8007b3dca89fd08a1123fae2ffdbe7bc72b99a7eabfb0a32e21b45a344159e62"},
+    {file = "app_store_server_library-3.1.2.tar.gz", hash = "sha256:0b9005c93298674c934dfa9bc164cd44bfc3f43a8d0dc3834eaf6f66c3572d45"},
 ]
 
 [[package]]
@@ -47,6 +67,19 @@ dependencies = [
 files = [
     {file = "asgiref-3.11.1-py3-none-any.whl", hash = "sha256:e8667a091e69529631969fd45dc268fa79b99c92c5fcdda727757e52146ec133"},
     {file = "asgiref-3.11.1.tar.gz", hash = "sha256:5f184dc43b7e763efe848065441eac62229c9f7b0475f41f80e207a114eda4ce"},
+]
+
+[[package]]
+name = "asn1"
+version = "3.2.0"
+summary = "Python-ASN1 is a simple ASN.1 encoder and decoder for Python 2.7+ and 3.5+."
+groups = ["default"]
+dependencies = [
+    "enum-compat",
+]
+files = [
+    {file = "asn1-3.2.0-py2.py3-none-any.whl", hash = "sha256:3c1788508d49f4f101c3c6b842b5a6d0fc9f68e2782e891d41af19bf321fedbb"},
+    {file = "asn1-3.2.0.tar.gz", hash = "sha256:0860ad40bbffd6475d2d54b82f50d9196e31b7cee985812ed9559b40e7d809c7"},
 ]
 
 [[package]]
@@ -219,6 +252,22 @@ dependencies = [
 files = [
     {file = "cachecontrol-0.14.4-py3-none-any.whl", hash = "sha256:b7ac014ff72ee199b5f8af1de29d60239954f223e948196fa3d84adaffc71d2b"},
     {file = "cachecontrol-0.14.4.tar.gz", hash = "sha256:e6220afafa4c22a47dd0badb319f84475d79108100d04e26e8542ef7d3ab05a1"},
+]
+
+[[package]]
+name = "cattrs"
+version = "26.1.0"
+requires_python = ">=3.10"
+summary = "Composable complex class support for attrs and dataclasses."
+groups = ["default"]
+dependencies = [
+    "attrs>=25.4.0",
+    "exceptiongroup>=1.1.1; python_version < \"3.11\"",
+    "typing-extensions>=4.14.0",
+]
+files = [
+    {file = "cattrs-26.1.0-py3-none-any.whl", hash = "sha256:d1e0804c42639494d469d08d4f26d6b9de9b8ab26b446db7b5f8c2e97f7c3096"},
+    {file = "cattrs-26.1.0.tar.gz", hash = "sha256:fa239e0f0ec0715ba34852ce813986dfed1e12117e209b816ab87401271cdd40"},
 ]
 
 [[package]]
@@ -871,6 +920,19 @@ dependencies = [
 files = [
     {file = "drf_spectacular_sidecar-2026.5.1-py3-none-any.whl", hash = "sha256:2af264e5b125fedc5d382be1349f7f736f128bc8fa05c3be3fc7f3e5b282d3c4"},
     {file = "drf_spectacular_sidecar-2026.5.1.tar.gz", hash = "sha256:cdeca03e32859318a563b5733d5fc196c8b563a178a85fd380e227ed642c19ca"},
+]
+
+[[package]]
+name = "enum-compat"
+version = "0.0.3"
+summary = "enum/enum34 compatibility package"
+groups = ["default"]
+dependencies = [
+    "enum34; python_version < \"3.4\"",
+]
+files = [
+    {file = "enum-compat-0.0.3.tar.gz", hash = "sha256:3677daabed56a6f724451d585662253d8fb4e5569845aafa8bb0da36b1a8751e"},
+    {file = "enum_compat-0.0.3-py3-none-any.whl", hash = "sha256:88091b617c7fc3bbbceae50db5958023c48dc40b50520005aa3bf27f8f7ea157"},
 ]
 
 [[package]]
@@ -1920,6 +1982,21 @@ dependencies = [
 files = [
     {file = "pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728"},
     {file = "pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423"},
+]
+
+[[package]]
+name = "pyopenssl"
+version = "26.4.0"
+requires_python = ">=3.9"
+summary = "Python wrapper module around the OpenSSL library"
+groups = ["default"]
+dependencies = [
+    "cryptography<51,>=49.0.0",
+    "typing-extensions>=4.9; python_version < \"3.13\"",
+]
+files = [
+    {file = "pyopenssl-26.4.0-py3-none-any.whl", hash = "sha256:f0eb0cb2d581d3ad2b9c489468485e7f2ab6727d08401bcf9d824c3caddf3c1c"},
+    {file = "pyopenssl-26.4.0.tar.gz", hash = "sha256:28dfcce0162b9211413e26dfbfdf1d24317fbeba18fc93c12400a1856b2a0bc7"},
 ]
 
 [[package]]
