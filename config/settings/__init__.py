@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "apps.courses",
     "apps.announcements",
     "apps.sync",
+    "apps.donations",
 ]
 
 MIDDLEWARE = [
@@ -95,6 +96,9 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "30/minute",
         "user": "150/minute",
+        # Each call verifies against Google Play/App Store Server API, so
+        # this needs to be much stricter than the general anon rate.
+        "donation_verify": "5/minute",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "config.pagination.GuitarPagination",
@@ -125,6 +129,12 @@ SIMPLE_JWT = {
 }
 
 GOOGLE_CLIENT_ID: str | None = settings.GOOGLE_CLIENT_ID
+
+GOOGLE_PLAY_PACKAGE_NAME: str | None = settings.GOOGLE_PLAY_PACKAGE_NAME
+GOOGLE_PLAY_SERVICE_ACCOUNT_INFO: str | None = settings.GOOGLE_PLAY_SERVICE_ACCOUNT_INFO
+
+APPLE_BUNDLE_ID: str | None = settings.APPLE_BUNDLE_ID
+APPLE_APP_APPLE_ID: int | None = settings.APPLE_APP_APPLE_ID
 
 if settings.ENVIRONMENT in {"staging", "production"}:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
