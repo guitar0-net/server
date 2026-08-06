@@ -275,6 +275,8 @@ def _acknowledge_android_purchase(purchase: Purchase) -> None:
             purchase_token=purchase.purchase_token,
         )
     except google_play_client.PurchaseAlreadyAcknowledgedError:
+        # A previous attempt already acknowledged it with Google — fine, we
+        # still need to mark the purchase COMPLETED below.
         pass
     except google_play_client.GooglePlayCommunicationError as exc:
         raise StoreCommunicationError(str(exc)) from exc
