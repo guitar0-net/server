@@ -41,7 +41,7 @@ license = {text = "AGPL-3.0-or-later"}
 
 [project.optional-dependencies]
 dev = [
-    "pip==26.1.2",
+    "pip==26.2.1",
     "pre-commit>=4.3.0",
     "ruff>=0.14.3",
     "mypy>=1.18.2",
