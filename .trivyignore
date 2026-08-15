@@ -2,53 +2,16 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Trivy vulnerability suppression file
-# No backport is planned. Accepted risk as per Debian Security Advisory policy.
+# Trivy vulnerability suppression file.
+#
+# Currently empty: every previous entry targeted the Debian Bookworm base of
+# python:3.14.4-slim and no longer matches anything since the image moved to
+# Debian 13 (trixie).
+#
+# When adding a suppression, keep the format:
+#   # <package>: <what the CVE is and why the risk is accepted>
+#   CVE-XXXX-YYYY exp:YYYY-MM-DD
+#
+# Always set an expiry date so the suppression is revisited instead of
+# silently outliving the base image it was written for.
 # See: https://security-tracker.debian.org/tracker/
-
-# glibc: Integer overflow in memalign leads to heap corruption
-CVE-2025-15281 exp:2026-10-01
-CVE-2026-0861 exp:2026-10-01
-CVE-2026-0915 exp:2026-10-01
-
-# glibc: Information disclosure via zero-valued network query
-CVE-2026-1703 exp:2026-10-01
-
-# glibc: wordexp with WRDE_REUSE and WRDE_APPEND may return uninitialized memory
-CVE-2026-2219 exp:2026-10-01
-
-# sqlite: Integer overflow in FTS5
-CVE-2025-7709 exp:2026-10-01
-
-# pip: no fix available yet
-CVE-2026-6357 exp:2026-07-01
-
-# --- Pending python:3.14.4-slim base image rebuild ---
-# Fixes exist in Debian Bookworm repos; suppressed until Docker Hub rebuilds the base image.
-
-# glibc: assertion failure on IBM1390/IBM1399 charset conversion (CVE-2026-4046, remote crash)
-# glibc: DNS non-answer section treated as valid answer in gethostbyaddr (CVE-2026-4437, CVE-2026-4438, spec violation)
-# Fixed: Bookworm 2.36-9+deb12u14
-CVE-2026-4046 exp:2026-08-01
-CVE-2026-4437 exp:2026-08-01
-CVE-2026-4438 exp:2026-08-01
-
-# systemd: unprivileged IPC call freezes systemd process (CVE-2026-29111, DoS)
-# systemd-machined RegisterMachine privilege escalation via class value (CVE-2026-4105)
-# systemd/udev: local root execution via malicious hardware and unsanitized kernel output (CVE-2026-40225)
-# systemd/nspawn: escape-to-host via crafted optional config file (CVE-2026-40226)
-# Fixed: Bookworm 252.39-1~deb12u2; udev/nspawn: systemd 260+
-CVE-2026-29111 exp:2026-08-01
-CVE-2026-4105  exp:2026-08-01
-CVE-2026-40225 exp:2026-09-01
-CVE-2026-40226 exp:2026-09-01
-
-# libcap: TOCTOU race in cap_set_file() allows capability injection (CVE-2026-4878, privilege escalation)
-CVE-2026-4878 exp:2026-08-01
-
-# sed: symlink race with -i --follow-symlinks allows arbitrary file overwrite (CVE-2026-5958, low severity)
-CVE-2026-5958 exp:2026-08-01
-
-# pip: tar+ZIP polyglot archive treated as ZIP, may install unintended files (CVE-2026-3219)
-# Fixed: pip 26.1+
-CVE-2026-3219 exp:2026-08-01

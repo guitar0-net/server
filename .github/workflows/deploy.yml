@@ -85,6 +85,9 @@ jobs:
           format: "sarif"
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
+          # Without this the action ignores `severity` in SARIF mode and scans
+          # every severity, so `exit-code` trips on MEDIUM/LOW findings too.
+          limit-severities-for-sarif: true
           exit-code: "1"
           ignore-unfixed: true
           trivyignores: ".trivyignore"
