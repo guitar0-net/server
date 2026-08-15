@@ -2,11 +2,18 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+from collections.abc import Iterable
+from datetime import UTC, datetime
+
 import pytest
 
+from apps.chords import services as chord_services
 from apps.chords.models import Chord, ChordPosition
 from apps.chords.services import ChordCreateDict, ChordPositionCreateDict, ChordService
 from apps.chords.tests.factories import FullChordFactory
+from apps.lessons.models import Lesson
+from apps.lessons.tests.factories import LessonFactory
+from apps.songs.tests.factories import SongFactory
 
 
 @pytest.mark.django_db
@@ -296,3 +303,144 @@ def test_replace_positions_empty_list(chord: Chord) -> None:
     ChordService._replace_positions(chord, [])
 
     assert chord.positions.count() == 0
+
+
+@pytest.mark.django_db
+def test_save_chord_propagates_updated_at_to_lessons_using_the_chord() -> None:
+    stale = datetime(2026, 3, 1, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Cadd9")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Тиша над Дніпром", chords=[chord])]
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.save_chord(chord=chord)
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale
+
+
+@pytest.mark.django_db
+def test_save_chord_leaves_lessons_alone_when_nothing_visible_changed() -> None:
+    stale = datetime(2026, 3, 7, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Asus2")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Роса на світанку", chords=[chord])]
+    )
+    ChordService.save_chord(chord=chord)
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.save_chord(chord=chord)
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at == stale
+
+
+@pytest.mark.django_db
+def test_save_chord_propagates_a_field_edit_that_leaves_the_svg_identical() -> None:
+    stale = datetime(2026, 3, 8, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Gadd11", musical_title="Соль з ундецимою")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Стежка до криниці", chords=[chord])]
+    )
+    ChordService.save_chord(chord=chord)
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+    chord.musical_title = "Соль-мажор з ундецимою"
+
+    ChordService.save_chord(chord=chord)
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale
+
+
+@pytest.mark.django_db
+def test_bulk_regenerate_svgs_propagates_updated_at_to_lessons() -> None:
+    stale = datetime(2026, 3, 2, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Gsus4")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Журавлі летять", chords=[chord])]
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.bulk_regenerate_svgs()
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale
+
+
+@pytest.mark.django_db
+def test_delete_chord_stamps_lessons_before_the_relation_disappears() -> None:
+    stale = datetime(2026, 3, 3, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Bm7")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Остання пісня", chords=[chord])]
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.delete_chord(chord=chord)
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale
+
+
+@pytest.mark.django_db
+def test_update_chord_propagates_updated_at_to_lessons_using_the_chord() -> None:
+    stale = datetime(2026, 3, 4, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Fmaj7")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Криниця біля хати", chords=[chord])]
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.update_chord(chord=chord, data={"musical_title": "Фа-мажор сьомий"})
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale
+
+
+@pytest.mark.django_db
+def test_bulk_regenerate_svgs_leaves_lessons_alone_when_no_svg_changed() -> None:
+    stale = datetime(2026, 3, 5, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Ddim7")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Вітер зі сходу", chords=[chord])]
+    )
+    ChordService.bulk_regenerate_svgs()
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.bulk_regenerate_svgs()
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at == stale
+
+
+@pytest.mark.django_db
+def test_bulk_regenerate_svgs_discards_the_svgs_when_propagation_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def refuse(chord_ids: Iterable[int]) -> int:
+        raise RuntimeError("зв'язок з уроками недоступний")
+
+    chord = FullChordFactory.create(title="Ebmaj7")
+    monkeypatch.setattr(chord_services, "touch_lessons_for_chords", refuse)
+
+    with pytest.raises(RuntimeError):
+        ChordService.bulk_regenerate_svgs()
+
+    chord.refresh_from_db()
+    assert not chord.svg_horizontal
+
+
+@pytest.mark.django_db
+def test_delete_chords_stamps_lessons_before_the_relation_disappears() -> None:
+    stale = datetime(2026, 3, 6, tzinfo=UTC)
+    chords = FullChordFactory.create_batch(2)
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Полонина вранці", chords=chords)]
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.delete_chords(chords=Chord.objects.all())
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale

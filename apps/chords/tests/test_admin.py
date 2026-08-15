@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+from datetime import UTC, datetime
+
 import pytest
 from django.contrib.admin import AdminSite, site
 from django.core.exceptions import PermissionDenied
@@ -14,6 +16,9 @@ from apps.accounts.tests.factories.user import UserFactory
 from apps.chords.admin import ChordAdmin, ChordPositionInline
 from apps.chords.models import Chord, ChordPosition
 from apps.chords.tests.factories import FullChordFactory
+from apps.lessons.models import Lesson
+from apps.lessons.tests.factories import LessonFactory
+from apps.songs.tests.factories import SongFactory
 
 
 @pytest.fixture
@@ -107,3 +112,74 @@ def test_chord_admin_save_related_populates_svg(
     chord.refresh_from_db()
     assert chord.svg_horizontal
     assert chord.svg_vertical
+
+
+@pytest.mark.django_db
+def test_chord_admin_save_persists_a_field_edited_in_the_form(
+    chord_admin: ChordAdmin,
+) -> None:
+    chord = FullChordFactory.create(musical_title="Ре-мажор")
+    request = RequestFactory().post("/")
+    request.user = UserFactory.create(is_superuser=True)
+    chord.musical_title = "Ре-мажор сьомий"
+    form = _make_bound_chord_form(chord)
+
+    chord_admin.save_model(request, chord, form, change=True)
+    chord_admin.save_related(request, form, [], change=True)
+
+    chord.refresh_from_db()
+    assert chord.musical_title == "Ре-мажор сьомий"
+
+
+@pytest.mark.django_db
+def test_chord_admin_save_leaves_lessons_alone_when_nothing_was_edited(
+    chord_admin: ChordAdmin,
+) -> None:
+    stale = datetime(2026, 6, 3, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Cmin7")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Дощ у неділю", chords=[chord])]
+    )
+    request = RequestFactory().post("/")
+    request.user = UserFactory.create(is_superuser=True)
+    chord_admin.save_related(request, _make_bound_chord_form(chord), [], change=True)
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    chord_admin.save_related(request, _make_bound_chord_form(chord), [], change=True)
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at == stale
+
+
+@pytest.mark.django_db
+def test_chord_admin_delete_model_propagates_updated_at_to_related_lessons(
+    chord_admin: ChordAdmin,
+) -> None:
+    stale = datetime(2026, 6, 1, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Cmaj9")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Мелодія осені", chords=[chord])]
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    chord_admin.delete_model(RequestFactory().post("/"), chord)
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale
+
+
+@pytest.mark.django_db
+def test_chord_admin_delete_queryset_propagates_updated_at_to_related_lessons(
+    chord_admin: ChordAdmin,
+) -> None:
+    stale = datetime(2026, 6, 2, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Emadd9")
+    lesson = LessonFactory.create(
+        songs=[SongFactory.create(title="Хмари над містом", chords=[chord])]
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    chord_admin.delete_queryset(RequestFactory().post("/"), Chord.objects.all())
+
+    lesson.refresh_from_db()
+    assert lesson.updated_at > stale
