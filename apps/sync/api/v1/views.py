@@ -73,6 +73,12 @@ class LessonsSyncView(APIView):
                 status=400,
             )
 
+        # Read the version before the lessons, never after. A concurrent touch
+        # landing between the two queries would otherwise be reflected in the
+        # version but absent from the payload, and the client — which stores
+        # the version as its next `since` — would skip that change forever.
+        # Reading first can only cost a redundant re-sync.
+        version = get_content_version()
         lessons_list = list(get_lessons_for_sync(since))
         songs_out, chord_map, scheme_map = self._collect_song_data(lessons_list)
 
@@ -86,7 +92,7 @@ class LessonsSyncView(APIView):
         )
 
         payload = {
-            "version": get_content_version(),
+            "version": version,
             "lesson_uuids": get_published_lesson_uuids(),
             "lessons": lessons_list,
             "songs": songs_out,

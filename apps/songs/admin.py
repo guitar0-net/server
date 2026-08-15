@@ -5,10 +5,13 @@
 """Admin settings for songs."""
 
 from django.contrib import admin
+from django.db.models import QuerySet
+from django.forms import ModelForm
+from django.http import HttpRequest
 from markdownx.admin import MarkdownxModelAdmin  # type: ignore[import-untyped]
 
 from apps.songs.models import Song
-from apps.songs.services import save_song
+from apps.songs.services import delete_song, delete_songs, save_song
 
 
 @admin.register(Song)
@@ -21,10 +24,27 @@ class SongAdmin(MarkdownxModelAdmin):  # type: ignore[misc]
 
     def save_model(  # noqa: PLR6301
         self,
-        request: object,
+        request: HttpRequest,
         obj: Song,
-        form: object,
-        change: object,
+        form: ModelForm[Song],
+        change: bool,
     ) -> None:
         """Save the song and propagate the change timestamp to related lessons."""
         save_song(obj)
+
+    def delete_model(self, request: HttpRequest, obj: Song) -> None:  # noqa: PLR6301
+        """Delete a song and propagate the change to lessons that used it."""
+        delete_song(obj)
+
+    def delete_queryset(  # noqa: PLR6301
+        self,
+        request: HttpRequest,
+        queryset: QuerySet[Song],
+    ) -> None:
+        """Delete the songs selected in the bulk action.
+
+        Django does not route the bulk action through `delete_model`, so the
+        propagation has to be repeated here or deleting from the changelist
+        would leave every affected lesson stale.
+        """
+        delete_songs(queryset)

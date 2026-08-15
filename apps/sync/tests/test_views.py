@@ -11,10 +11,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from apps.chords.tests.factories import ChordFactory
+from apps.chords.services import ChordService
+from apps.chords.tests.factories import ChordFactory, FullChordFactory
 from apps.courses.tests.factories import CourseFactory, CourseLessonFactory
 from apps.lessons.models import Lesson
 from apps.lessons.tests.factories import LessonFactory
+from apps.schemes.services import ImageSchemeService
 from apps.schemes.tests.factories import ImageSchemeFactory
 from apps.songs.tests.factories import SongFactory
 
@@ -500,3 +502,45 @@ def test_sync_lessons_course_lessons_exclude_unpublished_lesson(
     lesson_uuids_in_cl = [cl["lesson_uuid"] for cl in response.data["course_lessons"]]
     assert str(published.uuid) in lesson_uuids_in_cl
     assert str(unpublished.uuid) not in lesson_uuids_in_cl
+
+
+# =============================================================================
+# Delta sync must surface changes that originate below the lesson
+# =============================================================================
+
+
+@pytest.mark.django_db
+def test_delta_sync_returns_a_chord_whose_svg_was_regenerated(
+    api_client: APIClient,
+) -> None:
+    stale = datetime(2026, 5, 1, tzinfo=UTC)
+    chord = FullChordFactory.create(title="Dmaj7")
+    lesson = LessonFactory.create(
+        is_published=True,
+        songs=[SongFactory.create(title="Вечір над рікою", chords=[chord])],
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+
+    ChordService.bulk_regenerate_svgs()
+    response = api_client.get(reverse("sync-lessons"), {"since": stale.isoformat()})
+
+    assert [entry["id"] for entry in response.data["chords"]] == [chord.pk]
+
+
+@pytest.mark.django_db
+def test_delta_sync_returns_a_scheme_whose_inscription_was_edited(
+    api_client: APIClient,
+) -> None:
+    stale = datetime(2026, 5, 2, tzinfo=UTC)
+    scheme = ImageSchemeFactory.create(inscription="Бій «вальс»")
+    lesson = LessonFactory.create(
+        is_published=True,
+        songs=[SongFactory.create(title="Стежка в гори", schemes=[scheme])],
+    )
+    Lesson.objects.filter(pk=lesson.pk).update(updated_at=stale)
+    scheme.inscription = "Бій «вальс» — уточнено"
+
+    ImageSchemeService.save_image_scheme(scheme=scheme)
+    response = api_client.get(reverse("sync-lessons"), {"since": stale.isoformat()})
+
+    assert [entry["id"] for entry in response.data["schemes"]] == [scheme.pk]
