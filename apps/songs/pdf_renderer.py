@@ -31,35 +31,43 @@ class PrintSettings(TypedDict):
 
 _CHORD_WIDTHS: dict[Orientation, dict[Size, str]] = {
     "vertical": {
-        1: "7rem",
-        2: "8rem",
-        3: "9rem",
-        4: "10rem",
-        5: "12rem",
+        1: "16.66%",
+        2: "20%",
+        3: "25%",
+        4: "33.33%",
+        5: "50%",
     },
     "horizontal": {
-        1: "12rem",
-        2: "17rem",
-        3: "22rem",
-        4: "26rem",
-        5: "32rem",
+        1: "33.33%",
+        2: "50%",
+        3: "66.66%",
+        4: "80%",
+        5: "100%",
     },
 }
 
 _SCHEME_WIDTHS: dict[Size, str] = {
-    1: "100px",
-    2: "140px",
-    3: "180px",
-    4: "220px",
-    5: "260px",
+    1: "30%",
+    2: "40%",
+    3: "55%",
+    4: "70%",
+    5: "85%",
+}
+
+_LABEL_SIZES: dict[Size, str] = {
+    1: "8pt",
+    2: "9pt",
+    3: "10.5pt",
+    4: "12pt",
+    5: "14pt",
 }
 
 _FONT_SIZES: dict[Size, str] = {
-    1: "9pt",
-    2: "10pt",
-    3: "11pt",
-    4: "13pt",
-    5: "15pt",
+    1: "10pt",
+    2: "12pt",
+    3: "14pt",
+    4: "16pt",
+    5: "18pt",
 }
 
 
@@ -76,14 +84,16 @@ def render_song_pdf(song: Song, settings: PrintSettings) -> bytes:
             if svg:
                 chords.append({"title": chord.title, "svg": svg})
 
-    schemes = []
+    schemes: list[dict[str, str]] = []
     if settings["show_schemes"]:
-        for scheme in song.schemes.all():
-            if scheme.image:
-                schemes.append({
-                    "path": f"file://{scheme.image.path}",
-                    "inscription": scheme.inscription,
-                })
+        schemes.extend(
+            {
+                "path": f"file://{scheme.image.path}",
+                "inscription": scheme.inscription,
+            }
+            for scheme in song.schemes.all()
+            if scheme.image
+        )
 
     text_html = ""
     if settings["show_text"] and song.text:
@@ -98,7 +108,9 @@ def render_song_pdf(song: Song, settings: PrintSettings) -> bytes:
         "chord_width": _CHORD_WIDTHS[settings["chord_orientation"]][
             settings["chord_size"]
         ],
+        "chord_label_size": _LABEL_SIZES[settings["chord_size"]],
         "scheme_width": _SCHEME_WIDTHS[settings["scheme_size"]],
+        "scheme_caption_size": _LABEL_SIZES[settings["scheme_size"]],
         "text_font_size": _FONT_SIZES[settings["text_size"]],
     }
 

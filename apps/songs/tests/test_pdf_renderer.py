@@ -6,6 +6,8 @@
 
 import pytest
 
+from apps.chords.tests.factories import ChordFactory
+from apps.songs.models import Song
 from apps.songs.pdf_renderer import Orientation, PrintSettings, Size, render_song_pdf
 from apps.songs.tests.factories import SongFactory
 
@@ -30,6 +32,23 @@ def _default_settings(  # noqa: PLR0913
         scheme_size=scheme_size,
         text_size=text_size,
         columns_count=columns_count,
+    )
+
+
+def _song_with_drawn_chords(count: int) -> Song:
+    return SongFactory.create(
+        title="Ой, то не вечер",
+        chords=[
+            ChordFactory.create(
+                title=f"Аккорд {index}",
+                svg_vertical=(
+                    '<svg viewBox="0 0 91 214" xmlns="http://www.w3.org/2000/svg">'
+                    '<rect x="0" y="0" width="91" height="214" fill="none" '
+                    'stroke="currentColor"/></svg>'
+                ),
+            )
+            for index in range(count)
+        ],
     )
 
 
@@ -101,3 +120,12 @@ def test_render_song_pdf_with_xs_sizes_returns_pdf() -> None:
         _default_settings(chord_size=1, scheme_size=1, text_size=1),
     )
     assert result[:4] == b"%PDF"
+
+
+@pytest.mark.integration
+@pytest.mark.django_db
+def test_render_song_pdf_grows_with_chord_size() -> None:
+    song = _song_with_drawn_chords(8)
+    smallest = render_song_pdf(song, _default_settings(chord_size=1))
+    largest = render_song_pdf(song, _default_settings(chord_size=5))
+    assert len(largest) > len(smallest)
