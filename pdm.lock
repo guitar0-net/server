@@ -764,7 +764,7 @@ files = [
 
 [[package]]
 name = "django"
-version = "6.0.7"
+version = "6.1"
 requires_python = ">=3.12"
 summary = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 groups = ["default", "dev", "test"]
@@ -774,13 +774,13 @@ dependencies = [
     "tzdata; sys_platform == \"win32\"",
 ]
 files = [
-    {file = "django-6.0.7-py3-none-any.whl", hash = "sha256:a037427c2288443a8c02a1b02295a31c239663aa682bc50b1976afb7cf6a769e"},
-    {file = "django-6.0.7.tar.gz", hash = "sha256:2998503fc083124fb58037084bfa00de323c7c743f05f1b4284e77bff0ab8890"},
+    {file = "django-6.1-py3-none-any.whl", hash = "sha256:6c132cd980c9392b06807d4ca52d72530d631dc65a85d9dacede00a780cefbbe"},
+    {file = "django-6.1.tar.gz", hash = "sha256:86a2aacd59b817e4d6ac2ebfe22356c58f66f7b24e503f71b7c2fead677ee48b"},
 ]
 
 [[package]]
 name = "django-markdownx"
-version = "4.0.9"
+version = "4.0.11"
 summary = "A comprehensive Markdown editor built for Django."
 groups = ["default"]
 dependencies = [
@@ -789,32 +789,31 @@ dependencies = [
     "Pillow",
 ]
 files = [
-    {file = "django-markdownx-4.0.9.tar.gz", hash = "sha256:f82949beaddcaf5cbe765f580b1bf062b3aa5eea94633fdbbb6466514311a907"},
-    {file = "django_markdownx-4.0.9-py2.py3-none-any.whl", hash = "sha256:0e78759a8701073fee3e4883764a9bf1cdf3fe4c2941747acbe4f093f9285805"},
+    {file = "django_markdownx-4.0.11-py2.py3-none-any.whl", hash = "sha256:65d32d8892a3f9d678b149b7a0c3a073db6c6c10955df1c4f453b38eb96d163e"},
+    {file = "django_markdownx-4.0.11.tar.gz", hash = "sha256:0f2a4552174af98b621522eb36c8d1009a7f73d2bf591d973a34fc65cc740680"},
 ]
 
 [[package]]
 name = "django-stubs"
-version = "6.0.3"
-requires_python = ">=3.10"
+version = "6.1.0"
+requires_python = ">=3.11"
 summary = "Mypy stubs for Django"
 groups = ["dev"]
 dependencies = [
     "django",
     "django-stubs-ext>=6.0.2",
-    "tomli; python_full_version < \"3.11\"",
     "types-pyyaml",
     "typing-extensions>=4.11.0",
 ]
 files = [
-    {file = "django_stubs-6.0.3-py3-none-any.whl", hash = "sha256:5fee22bcbbad59a78c727a820b6f4e68ff442ca76a922b7002e57c25dd7cb390"},
-    {file = "django_stubs-6.0.3.tar.gz", hash = "sha256:ee895f403c373608eeb50822f0733f9d9ec5ab12731d4ab58956053bb95fdd9e"},
+    {file = "django_stubs-6.1.0-py3-none-any.whl", hash = "sha256:63b23ccca2616d464ed7e37d1ce44960315cb3cecab75b23c928467ef125e560"},
+    {file = "django_stubs-6.1.0.tar.gz", hash = "sha256:b6aecc5c738a103135f76ba160a6f75e3b27dcf0200c64d7226018cdbc2340dd"},
 ]
 
 [[package]]
 name = "django-stubs-ext"
-version = "6.0.3"
-requires_python = ">=3.10"
+version = "6.1.0"
+requires_python = ">=3.11"
 summary = "Monkey-patching and extensions for django-stubs"
 groups = ["dev"]
 dependencies = [
@@ -822,22 +821,22 @@ dependencies = [
     "typing-extensions",
 ]
 files = [
-    {file = "django_stubs_ext-6.0.3-py3-none-any.whl", hash = "sha256:9e4105955419ae310d7da9cfd808e039d4dae3092c628f021057bb4f2c237f8f"},
-    {file = "django_stubs_ext-6.0.3.tar.gz", hash = "sha256:3307d42132bc295d5744de6276bc5fdf6896efc70f891e21c0ae8bdf529d2762"},
+    {file = "django_stubs_ext-6.1.0-py3-none-any.whl", hash = "sha256:57273506823274700a707c8f404dfb52a12c4554daf1468dfb2bff857bb22074"},
+    {file = "django_stubs_ext-6.1.0.tar.gz", hash = "sha256:d5635a481f5bdf2e04d533a8b602d3b9a28f073deffc85b83048dd20032e4d20"},
 ]
 
 [[package]]
 name = "djangorestframework"
-version = "3.17.1"
+version = "3.18.0"
 requires_python = ">=3.10"
 summary = "Web APIs for Django, made easy."
 groups = ["default"]
 dependencies = [
-    "django>=4.2",
+    "django>=5.2",
 ]
 files = [
-    {file = "djangorestframework-3.17.1-py3-none-any.whl", hash = "sha256:c3c74dd3e83a5a3efc37b3c18d92bd6f86a6791c7b7d4dff62bb068500e76457"},
-    {file = "djangorestframework-3.17.1.tar.gz", hash = "sha256:a6def5f447fe78ff853bff1d47a3c59bf38f5434b031780b351b0c73a62db1a5"},
+    {file = "djangorestframework-3.18.0-py3-none-any.whl", hash = "sha256:381fc44d3249c9565c5f723850855b734e99030eb30957a49f506d3fe11d7dcb"},
+    {file = "djangorestframework-3.18.0.tar.gz", hash = "sha256:2323a5111837e0b784dcb8323abc78ecc54fa2a5af7aff2677cf50cdd849477f"},
 ]
 
 [[package]]
@@ -874,24 +873,24 @@ files = [
 
 [[package]]
 name = "djangorestframework-stubs"
-version = "3.16.9"
+version = "3.18.0"
 requires_python = ">=3.10"
 summary = "PEP-484 stubs for django-rest-framework"
 groups = ["dev"]
 dependencies = [
-    "django-stubs>=5.2.9",
+    "django-stubs>=6.0.9",
     "types-pyyaml",
     "typing-extensions>=4.0",
 ]
 files = [
-    {file = "djangorestframework_stubs-3.16.9-py3-none-any.whl", hash = "sha256:27b3e245d5f9c22ff6988d9e54388249f98f88608cc2b365b71e9f39dd096958"},
-    {file = "djangorestframework_stubs-3.16.9.tar.gz", hash = "sha256:b1abb97490c90c85eabcd09b8ecbadae1b9360f21ad3021abf830227c0129697"},
+    {file = "djangorestframework_stubs-3.18.0-py3-none-any.whl", hash = "sha256:dd04de8100689851e13843eebdc03a84d336f34aab6d30c726bca0f2f11aaf6b"},
+    {file = "djangorestframework_stubs-3.18.0.tar.gz", hash = "sha256:072adaf1a6f507e2ccca2e4ba5611a2259d6c9d171eb6256c103acecdd33a40d"},
 ]
 
 [[package]]
 name = "drf-spectacular"
-version = "0.29.0"
-requires_python = ">=3.7"
+version = "0.30.0"
+requires_python = ">=3.8"
 summary = "Sane and flexible OpenAPI 3 schema generation for Django REST framework"
 groups = ["default"]
 dependencies = [
@@ -904,13 +903,13 @@ dependencies = [
     "uritemplate>=2.0.0",
 ]
 files = [
-    {file = "drf_spectacular-0.29.0-py3-none-any.whl", hash = "sha256:d1ee7c9535d89848affb4427347f7c4a22c5d22530b8842ef133d7b72e19b41a"},
-    {file = "drf_spectacular-0.29.0.tar.gz", hash = "sha256:0a069339ea390ce7f14a75e8b5af4a0860a46e833fd4af027411a3e94fc1a0cc"},
+    {file = "drf_spectacular-0.30.0-py3-none-any.whl", hash = "sha256:006cf5921ebe20a9bd24f7c846261ebbf78780be5961b0d6e87afaa82afd62ff"},
+    {file = "drf_spectacular-0.30.0.tar.gz", hash = "sha256:53e79e7ba00e240441b63c32273754a5368e4c2ab44a19f2595277cc1cd559c9"},
 ]
 
 [[package]]
 name = "drf-spectacular-sidecar"
-version = "2026.5.1"
+version = "2026.8.1"
 requires_python = ">=3.6"
 summary = "Serve self-contained distribution builds of Swagger UI and Redoc with Django"
 groups = ["default"]
@@ -918,8 +917,8 @@ dependencies = [
     "Django>=2.2",
 ]
 files = [
-    {file = "drf_spectacular_sidecar-2026.5.1-py3-none-any.whl", hash = "sha256:2af264e5b125fedc5d382be1349f7f736f128bc8fa05c3be3fc7f3e5b282d3c4"},
-    {file = "drf_spectacular_sidecar-2026.5.1.tar.gz", hash = "sha256:cdeca03e32859318a563b5733d5fc196c8b563a178a85fd380e227ed642c19ca"},
+    {file = "drf_spectacular_sidecar-2026.8.1-py3-none-any.whl", hash = "sha256:6b8784d3e8c6bd9aa740b14e874640697ab1bc67f5232d74fdd9ef84eaea6bc3"},
+    {file = "drf_spectacular_sidecar-2026.8.1.tar.gz", hash = "sha256:9d9ee678e5ec70cdda2c7ed95cafcdb6141664dc3e11def8a8599c8ad36cf6f5"},
 ]
 
 [[package]]
@@ -2413,13 +2412,13 @@ files = [
 
 [[package]]
 name = "sqlparse"
-version = "0.5.5"
-requires_python = ">=3.8"
+version = "0.6.0"
+requires_python = ">=3.10"
 summary = "A non-validating SQL parser."
 groups = ["default", "dev", "test"]
 files = [
-    {file = "sqlparse-0.5.5-py3-none-any.whl", hash = "sha256:12a08b3bf3eec877c519589833aed092e2444e68240a3577e8e26148acc7b1ba"},
-    {file = "sqlparse-0.5.5.tar.gz", hash = "sha256:e20d4a9b0b8585fdf63b10d30066c7c94c5d7a7ec47c889a2d83a3caa93ff28e"},
+    {file = "sqlparse-0.6.0-py3-none-any.whl", hash = "sha256:b861c0288ce2fa56209a9a6412d2e066ac664b3873b89c26c9d8415e8e32996f"},
+    {file = "sqlparse-0.6.0.tar.gz", hash = "sha256:113c35c75365ab9cc9c7231d68c6428fb11c085fc8e9eb1ad659b7ddbf6cd2b9"},
 ]
 
 [[package]]
