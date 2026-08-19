@@ -31,67 +31,56 @@ SPDX-License-Identifier: AGPL-3.0-or-later -->
         border-bottom: 1pt solid #333;
       }
 
-      /* ── Chords section ── */
-      .chords-section {
+      /* ── Chord and scheme grids ── */
+      .chords-section,
+      .schemes-section {
         margin-bottom: 12pt;
       }
 
-      .chords-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8pt;
-        align-items: flex-start;
+      .chords-grid,
+      .schemes-row {
+        font-size: 0;
+        margin: 0 -4pt;
+        orphans: 1;
+        widows: 1;
+      }
+
+      .chord-item,
+      .scheme-item {
+        display: inline-block;
+        vertical-align: top;
+        text-align: center;
+        padding: 0 4pt;
+        margin-bottom: 8pt;
       }
 
       .chord-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         width: {{ chord_width }};
       }
 
-      .chord-item svg {
+      .scheme-item {
+        width: {{ scheme_width }};
+      }
+
+      .chord-item svg,
+      .scheme-item img {
         width: 100%;
         height: auto;
         display: block;
       }
 
       .chord-name {
-        font-size: 0.8em;
+        font-size: {{ chord_label_size }};
         font-weight: bold;
-        margin-top: 2pt;
-        text-align: center;
-      }
-
-      /* ── Schemes section ── */
-      .schemes-section {
-        margin-bottom: 12pt;
-      }
-
-      .schemes-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8pt;
-        align-items: flex-start;
-      }
-
-      .scheme-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .scheme-item img {
-        width: {{ scheme_width }};
-        height: auto;
-        display: block;
+        line-height: 1.1;
+        margin-bottom: 2pt;
       }
 
       .scheme-caption {
-        font-size: 0.8em;
+        font-size: {{ scheme_caption_size }};
         font-weight: bold;
+        line-height: 1.1;
         margin-bottom: 2pt;
-        text-align: center;
       }
 
       /* ── Text section ── */
