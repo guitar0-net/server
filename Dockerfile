@@ -36,7 +36,18 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install system dependencies (libpango/cairo required by WeasyPrint)
+# Install system dependencies (libpango/cairo required by WeasyPrint).
+#
+# util-linux is pulled from trixie-security on top of whatever the base image
+# ships. python:*-slim carries 2.41-5, which still has CVE-2026-53612..53615
+# (mount(8) SUID privesc, libblkid overflow) and hard-fails the CRITICAL/HIGH
+# Trivy gate in deploy.yml. Strict versioned deps make apt drag the rest of the
+# source package along (mount, bsdutils, libblkid1, libmount1, libsmartcols1,
+# libuuid1, liblastlog2-2, login), so naming util-linux alone is enough.
+#
+# This is a stopgap, not a permanent hand-managed pin: the build uses
+# `pull: true`, so once the python image is rebuilt against current
+# trixie-security the line becomes a no-op and can be dropped.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
@@ -47,6 +58,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgdk-pixbuf-2.0-0 \
     shared-mime-info \
     fonts-liberation \
+    && apt-get install -y --no-install-recommends --only-upgrade util-linux \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
