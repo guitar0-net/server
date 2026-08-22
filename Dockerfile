@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Stage 1: Builder
-FROM python:3.14.6-slim AS builder
+FROM python:3.14.7-slim AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY pyproject.toml pdm.lock ./
 RUN pdm export --no-hashes -o requirements.txt --prod
 
 # Stage 2: Production
-FROM python:3.14.6-slim AS production
+FROM python:3.14.7-slim AS production
 
 # Build arguments for versioning
 ARG VERSION=unknown
