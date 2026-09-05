@@ -28,7 +28,7 @@ jobs:
         uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
-          version: "2.28.2"
+          version: "2.29.0"
           cache: true
           cache-dependency-path: |
             pdm.lock
@@ -59,7 +59,7 @@ jobs:
         uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
-          version: "2.28.2"
+          version: "2.29.0"
           cache: true
           cache-dependency-path: |
             pdm.lock
@@ -90,7 +90,7 @@ jobs:
         uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
-          version: "2.28.2"
+          version: "2.29.0"
           cache: true
           cache-dependency-path: |
             pdm.lock
@@ -130,7 +130,7 @@ jobs:
         uses: pdm-project/setup-pdm@v4
         with:
           python-version: "3.14"
-          version: "2.28.2"
+          version: "2.29.0"
           cache: true
           cache-dependency-path: |
             pdm.lock
