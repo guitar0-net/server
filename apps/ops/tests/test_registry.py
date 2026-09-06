@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Tests for the metrics registry singleton."""
+"""Tests for the ops registry singleton."""
 
 import importlib
 import threading
@@ -15,11 +15,7 @@ from uuid import uuid4
 import pytest
 from prometheus_client import CollectorRegistry, Counter
 
-from apps.ops.registry import (
-    build_exposition_registry,
-    get_registry,
-    reset_registry,
-)
+from apps.ops import registry as registry_module
 
 
 @pytest.fixture(autouse=True)
@@ -27,16 +23,16 @@ def isolate_registry() -> Generator[None]:
     """Isolate each test by resetting registry before and after."""
     from apps.ops import metrics as metrics_module
 
-    reset_registry()
+    registry_module.reset_registry()
     importlib.reload(metrics_module)
     yield
-    reset_registry()
+    registry_module.reset_registry()
     importlib.reload(metrics_module)
 
 
 def test_get_registry_returns_same_instance_on_multiple_calls() -> None:
-    registry1 = get_registry()
-    registry2 = get_registry()
+    registry1 = registry_module.get_registry()
+    registry2 = registry_module.get_registry()
     assert registry1 is registry2
 
 
@@ -47,7 +43,7 @@ def test_get_registry_thread_safety() -> None:
 
     def get_registry_thread() -> None:
         try:
-            registries.append(get_registry())
+            registries.append(registry_module.get_registry())
         except Exception as e:  # noqa: BLE001
             errors.append(e)
 
@@ -65,24 +61,24 @@ def test_get_registry_thread_safety() -> None:
 
 
 def test_reset_registry_creates_new_instance() -> None:
-    registry1 = get_registry()
-    reset_registry()
-    registry2 = get_registry()
+    registry1 = registry_module.get_registry()
+    registry_module.reset_registry()
+    registry2 = registry_module.get_registry()
     assert registry1 is not registry2
 
 
 def test_reset_registry_allows_reregistration() -> None:
     """Test that resetting allows metrics to be registered again."""
-    registry1 = get_registry()
+    registry1 = registry_module.get_registry()
     Counter(
         name="test_counter_unique",
         documentation="Test counter",
         registry=registry1,
     )
 
-    reset_registry()
+    registry_module.reset_registry()
 
-    registry2 = get_registry()
+    registry2 = registry_module.get_registry()
     counter = Counter(
         name="test_counter_unique",
         documentation="Test counter",
@@ -97,9 +93,7 @@ def test_double_checked_locking_inner_check_returns_existing_registry() -> None:
     This covers the branch where a thread enters the lock
     but _registry is already set (by another thread).
     """
-    import apps.ops.registry as registry_module
-
-    reset_registry()
+    registry_module.reset_registry()
 
     existing_registry = CollectorRegistry()
 
@@ -123,7 +117,7 @@ def test_double_checked_locking_inner_check_returns_existing_registry() -> None:
 
     with patch.object(registry_module, "_lock", MockLock()):
         registry_module._registry = None
-        result = get_registry()
+        result = registry_module.get_registry()
 
     assert result is existing_registry
     assert call_count == 1
@@ -142,16 +136,21 @@ def test_build_exposition_registry_serves_the_singleton_without_multiproc_dir(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.delenv("PROMETHEUS_MULTIPROC_DIR", raising=False)
-    assert build_exposition_registry() is get_registry()
+    assert registry_module.build_exposition_registry() is registry_module.get_registry()
 
 
 def test_build_exposition_registry_dont_expose_the_singleton_in_multiprocess_mode(
     multiproc_dir: Path,
 ) -> None:
-    assert build_exposition_registry() is not get_registry()
+    assert (
+        registry_module.build_exposition_registry()
+        is not registry_module.get_registry()
+    )
 
 
 def test_build_exposition_registry_builds_one_registry_per_scrape_in_multiprocess_mode(
     multiproc_dir: Path,
 ) -> None:
-    assert build_exposition_registry() is not build_exposition_registry()
+    first_scrape = registry_module.build_exposition_registry()
+
+    assert first_scrape is not registry_module.build_exposition_registry()
