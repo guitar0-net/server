@@ -34,7 +34,10 @@ worker_class = "sync"
 timeout = 30
 keepalive = 2
 
-worker_tmp_dir = "/dev/shm"
+# tmpfs for the worker heartbeat: a slow write on overlayfs makes the arbiter
+# kill healthy workers. nosec B108 — gunicorn creates the file with mkstemp()
+# and unlinks it at once, so there is no predictable path to hijack.
+worker_tmp_dir = "/dev/shm"  # nosec B108
 
 # Recycling off: every worker pid leaves mmap files that are never reclaimed.
 max_requests = 0
