@@ -80,6 +80,33 @@ def get_logging_config(settings: Settings) -> LoggingConfig:
     Returns:
         LoggingConfig: The complete Django logging configuration dictionary.
     """
+    log_to_file = settings.ENVIRONMENT == "development"
+    handlers: dict[str, _Handler] = {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "class": "django.utils.log.AdminEmailHandler",
+            "filters": ["require_debug_false"],
+        },
+    }
+    if log_to_file:
+        handlers["file"] = {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": str(settings.LOG_FILE_PATH),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+            "filters": ["sensitive_data_filter"],
+        }
+
+    default_handlers = ["console", "file"] if log_to_file else ["console"]
+    app_level: DebugLevel = "DEBUG" if settings.DEBUG else "INFO"
+
     base_logging: LoggingConfig = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -102,56 +129,36 @@ def get_logging_config(settings: Settings) -> LoggingConfig:
                 "()": "config.settings.filters.SensitiveDataFilter",
             },
         },
-        "handlers": {
-            "console": {
-                "level": "DEBUG",
-                "class": "logging.StreamHandler",
-                "formatter": "simple",
-            },
-            "file": {
-                "level": "INFO",
-                "class": "logging.handlers.RotatingFileHandler",
-                "filename": str(settings.LOG_FILE_PATH),
-                "maxBytes": 1024 * 1024 * 5,
-                "backupCount": 5,
-                "formatter": "verbose",
-                "filters": ["sensitive_data_filter"],
-            },
-            "mail_admins": {
-                "level": "ERROR",
-                "class": "django.utils.log.AdminEmailHandler",
-                "filters": ["require_debug_false"],
-            },
-        },
+        "handlers": handlers,
         "loggers": {
             "": {
-                "handlers": ["console", "file"],
+                "handlers": default_handlers,
                 "level": "WARNING",
                 "propagate": False,
             },
             "django": {
-                "handlers": ["console", "file", "mail_admins"],
+                "handlers": [*default_handlers, "mail_admins"],
                 "level": "INFO",
                 "propagate": False,
             },
             "rest_framework": {
-                "handlers": ["console", "file"],
+                "handlers": default_handlers,
                 "level": "INFO",
                 "propagate": False,
             },
             "accounts": {
-                "handlers": ["console", "file"],
-                "level": "DEBUG" if settings.DEBUG else "INFO",
+                "handlers": default_handlers,
+                "level": app_level,
                 "propagate": False,
             },
             "lessons": {
-                "handlers": ["console", "file"],
-                "level": "DEBUG" if settings.DEBUG else "INFO",
+                "handlers": default_handlers,
+                "level": app_level,
                 "propagate": False,
             },
             "courses": {
-                "handlers": ["console", "file"],
-                "level": "DEBUG" if settings.DEBUG else "INFO",
+                "handlers": default_handlers,
+                "level": app_level,
                 "propagate": False,
             },
         },

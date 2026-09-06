@@ -8,7 +8,7 @@ from django.http import HttpRequest, HttpResponse
 from django.views.decorators.http import require_GET
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
-from .registry import get_registry
+from .registry import build_exposition_registry
 
 
 @require_GET
@@ -21,7 +21,7 @@ def metrics_view(request: HttpRequest) -> HttpResponse:
     Returns:
         HTTP response with Prometheus metrics in text format.
     """
-    registry = get_registry()
+    registry = build_exposition_registry()
     metrics_output = generate_latest(registry)
     response = HttpResponse(
         metrics_output,
