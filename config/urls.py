@@ -44,7 +44,7 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    path("metrics/", include("apps.ops.urls")),
+    path("", include("apps.ops.urls")),
     path("markdownx/", include("markdownx.urls")),
 ]
 

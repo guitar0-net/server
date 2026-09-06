@@ -6,10 +6,12 @@
 
 from django.urls import path
 
-from .views import metrics_view
+from .views import health_view, metrics_view, ready_view
 
 app_name = "ops"
 
 urlpatterns = [
-    path("", metrics_view, name="prometheus"),
+    path("metrics/", metrics_view, name="prometheus"),
+    path("health/", health_view, name="health"),
+    path("ready/", ready_view, name="ready"),
 ]
