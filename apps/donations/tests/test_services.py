@@ -19,6 +19,7 @@ from apps.donations import app_store_client, google_play_client
 from apps.donations.constants import Platform, PurchaseStatus
 from apps.donations.models import Purchase
 from apps.donations.services import (
+    PurchasePendingError,
     PurchaseVerificationError,
     StoreCommunicationError,
     UnknownDonationProductError,
@@ -104,24 +105,26 @@ def test_verify_and_record_purchase_rejects_a_platform_that_is_neither_store() -
 
 
 @pytest.mark.django_db
-def test_verify_and_record_purchase_rejects_a_new_android_purchase_for_retired_product(
+def test_verify_and_record_purchase_records_a_new_android_purchase_for_retired_product(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     product = DonationProductFactory.create(is_active=False)
     _stub_google_get_purchase(
         monkeypatch, {"purchaseState": 0, "orderId": "GPA.tx-retired"}
     )
+    _stub_google_acknowledge(monkeypatch)
 
-    with pytest.raises(UnknownDonationProductError):
-        verify_and_record_purchase(
-            platform=Platform.ANDROID,
-            product_id=product.product_id,
-            store_transaction_id="GPA.tx-retired",
-            purchase_token="token-retired",
-            signed_transaction_info="",
-            user=None,
-            device_id="device-1",
-        )
+    purchase = verify_and_record_purchase(
+        platform=Platform.ANDROID,
+        product_id=product.product_id,
+        store_transaction_id="GPA.tx-retired",
+        purchase_token="token-retired",
+        signed_transaction_info="",
+        user=None,
+        device_id="device-1",
+    )
+
+    assert purchase.status == PurchaseStatus.COMPLETED
 
 
 @pytest.mark.django_db
@@ -231,7 +234,7 @@ def test_verify_and_record_purchase_attaches_authenticated_user_directly(
 
 
 @pytest.mark.django_db
-def test_verify_and_record_purchase_rejects_android_purchase_not_in_purchased_state(
+def test_verify_and_record_purchase_rejects_a_canceled_android_purchase(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     product = DonationProductFactory.create()
@@ -246,6 +249,25 @@ def test_verify_and_record_purchase_rejects_android_purchase_not_in_purchased_st
             signed_transaction_info="",
             user=None,
             device_id="device-1",
+        )
+
+
+@pytest.mark.django_db
+def test_verify_and_record_purchase_defers_an_android_purchase_pending_payment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    product = DonationProductFactory.create()
+    _stub_google_get_purchase(monkeypatch, {"purchaseState": 2})
+
+    with pytest.raises(PurchasePendingError):
+        verify_and_record_purchase(
+            platform=Platform.ANDROID,
+            product_id=product.product_id,
+            store_transaction_id="GPA.tx-ожидание",
+            purchase_token="токен-ожидание",
+            signed_transaction_info="",
+            user=None,
+            device_id="устройство-1",
         )
 
 
@@ -272,6 +294,29 @@ def test_verify_and_record_purchase_rejects_a_claimed_id_google_does_not_confirm
     assert not Purchase.objects.filter(
         store_transaction_id="GPA.someone-elses-claim"
     ).exists()
+
+
+@pytest.mark.django_db
+def test_verify_and_record_purchase_keys_a_cleared_android_purchase_on_googles_id(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    product = DonationProductFactory.create(product_id="спасибо-отложенное")
+    _stub_google_get_purchase(
+        monkeypatch, {"purchaseState": 0, "orderId": "GPA.заказ-прояснился"}
+    )
+    _stub_google_acknowledge(monkeypatch)
+
+    purchase = verify_and_record_purchase(
+        platform=Platform.ANDROID,
+        product_id=product.product_id,
+        store_transaction_id="",
+        purchase_token="токен-без-заказа",
+        signed_transaction_info="",
+        user=None,
+        device_id="устройство-без-заказа",
+    )
+
+    assert purchase.store_transaction_id == "GPA.заказ-прояснился"
 
 
 @pytest.mark.django_db
@@ -580,7 +625,7 @@ def test_verify_and_record_purchase_creates_completed_ios_purchase(
 
 
 @pytest.mark.django_db
-def test_verify_and_record_purchase_rejects_a_new_ios_purchase_for_a_retired_product(
+def test_verify_and_record_purchase_records_a_new_ios_purchase_for_a_retired_product(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     product = DonationProductFactory.create(is_active=False)
@@ -588,16 +633,17 @@ def test_verify_and_record_purchase_rejects_a_new_ios_purchase_for_a_retired_pro
         monkeypatch, transaction_id="tx-ios-retired", product_id=product.product_id
     )
 
-    with pytest.raises(UnknownDonationProductError):
-        verify_and_record_purchase(
-            platform=Platform.IOS,
-            product_id=product.product_id,
-            store_transaction_id="tx-ios-retired",
-            purchase_token="",
-            signed_transaction_info="jws-ios-retired",
-            user=None,
-            device_id="device-1",
-        )
+    purchase = verify_and_record_purchase(
+        platform=Platform.IOS,
+        product_id=product.product_id,
+        store_transaction_id="tx-ios-retired",
+        purchase_token="",
+        signed_transaction_info="jws-ios-retired",
+        user=None,
+        device_id="device-1",
+    )
+
+    assert purchase.status == PurchaseStatus.COMPLETED
 
 
 @pytest.mark.django_db

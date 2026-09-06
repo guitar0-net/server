@@ -14,7 +14,11 @@ from django.db import IntegrityError
 
 from apps.accounts.models.user import User
 from apps.donations import app_store_client, google_play_client
-from apps.donations.constants import Platform, PurchaseStatus
+from apps.donations.constants import (
+    GooglePlayPurchaseState,
+    Platform,
+    PurchaseStatus,
+)
 from apps.donations.models import DonationProduct, Purchase
 from apps.donations.selectors import (
     get_donation_product,
@@ -24,13 +28,13 @@ from apps.donations.selectors import (
 
 
 class UnknownDonationProductError(Exception):
-    """Raised when product_id can't be sold as a new purchase right now.
+    """Raised when product_id matches no DonationProduct at all.
 
-    Covers both a product_id that matches no DonationProduct at all, and one
-    that matches a product staff have deactivated *and* has no purchase
-    already recorded against it — a deactivated product with an existing
-    purchase is still verified/reconciled normally, see
-    `verify_and_record_purchase`.
+    Deliberately not raised for a product staff have deactivated: `is_active`
+    governs what new buyers are offered, not what the stores have already
+    charged for. Once a store confirms a payment, refusing to record it would
+    leave the purchase unacknowledged and silently auto-refunded, so a
+    retired product is verified and recorded like any other.
     """
 
 
@@ -41,6 +45,17 @@ class PurchaseVerificationError(Exception):
     product, is not in a purchased state, was revoked, or whose claimed
     store_transaction_id doesn't match what the store reports. The caller
     sent bad data — retrying the same request will not help.
+    """
+
+
+class PurchasePendingError(Exception):
+    """Raised when the store holds the purchase but payment has not cleared.
+
+    Deliberately not a `PurchaseVerificationError`: nothing is wrong with the
+    receipt, and the very same request succeeds once a slow payment method
+    clears, so the caller must keep the transaction open and come back later
+    instead of writing the purchase off. Android-only — StoreKit withholds
+    the signed transaction until the payment settles, so iOS never gets here.
     """
 
 
@@ -80,7 +95,10 @@ def verify_and_record_purchase(  # noqa: PLR0913
         product_id: The store SKU the client believes it purchased.
         store_transaction_id: The store's own transaction identifier, as
             claimed by the client; cross-checked against the verified
-            response for both platforms.
+            response when the client has one. Empty for an Android purchase
+            the client saw as pending: the Billing Library documents
+            `Purchase.getOrderId()` as null until the purchase reaches
+            PurchaseState.PURCHASED.
         purchase_token: Android's opaque purchase token. Unused for iOS.
         signed_transaction_info: iOS's signed transaction JWS from StoreKit.
             Unused for Android.
@@ -91,11 +109,12 @@ def verify_and_record_purchase(  # noqa: PLR0913
         Purchase: The verified, persisted purchase record.
 
     Raises:
-        UnknownDonationProductError: If product_id is unknown, or names a
-            deactivated product with no purchase already recorded for it.
+        UnknownDonationProductError: If product_id matches no DonationProduct.
         PurchaseVerificationError: If the store rejects the purchase, or the
             store's own transaction id doesn't match the id claimed by the
             client.
+        PurchasePendingError: If Google Play holds the purchase pending a
+            payment that has not cleared yet.
         StoreCommunicationError: If Google Play cannot be reached.
     """
     product = get_donation_product(product_id)
@@ -213,7 +232,11 @@ def _verify_android_purchase(
     The row is keyed on Google's own `orderId`, fetched from the purchase
     resource itself — `purchase_token` has no client-verifiable id of its
     own, so `claimed_store_transaction_id` is only ever used to cross-check
-    against it, never written to the database directly.
+    against it, never written to the database directly. That claim is empty
+    for a purchase the client saw as pending — the Billing Library's
+    `Purchase.getOrderId()` stays null until PurchaseState.PURCHASED — so
+    there is nothing to cross-check and the pending branch below is what the
+    caller gets.
     """
     try:
         response = google_play_client.get_purchase(
@@ -224,15 +247,20 @@ def _verify_android_purchase(
     except google_play_client.GooglePlayCommunicationError as exc:
         raise StoreCommunicationError(str(exc)) from exc
 
-    if response.get("purchaseState") != 0:
+    purchase_state = response.get("purchaseState")
+    if purchase_state == GooglePlayPurchaseState.PENDING:
+        raise PurchasePendingError(
+            "Google Play reports the purchase as pending payment."
+        )
+    if purchase_state != GooglePlayPurchaseState.PURCHASED:
         raise PurchaseVerificationError(
-            f"Purchase is not in the purchased state: {response.get('purchaseState')!r}"
+            f"Purchase is not in the purchased state: {purchase_state!r}"
         )
 
     order_id = response.get("orderId")
     if not isinstance(order_id, str) or not order_id:
         raise PurchaseVerificationError("Google Play response is missing an orderId.")
-    if order_id != claimed_store_transaction_id:
+    if claimed_store_transaction_id and order_id != claimed_store_transaction_id:
         raise PurchaseVerificationError(
             "store_transaction_id does not match Google's orderId for this purchase."
         )
@@ -240,9 +268,6 @@ def _verify_android_purchase(
     existing = get_purchase(Platform.ANDROID, order_id)
     if existing is not None:
         return _reconcile_existing_purchase(existing, user=user)
-
-    if not product.is_active:
-        raise UnknownDonationProductError(product.product_id)
 
     # amount/currency stay unset here: Google's purchases.products resource
     # doesn't report price, unlike Apple's transaction payload.
@@ -323,9 +348,6 @@ def _verify_ios_purchase(
     existing = get_purchase(Platform.IOS, transaction_id)
     if existing is not None:
         return _reconcile_existing_purchase(existing, user=user)
-
-    if not product.is_active:
-        raise UnknownDonationProductError(product.product_id)
 
     amount, currency = _extract_apple_price(response)
     purchase, _ = _create_purchase_or_recover_from_race(

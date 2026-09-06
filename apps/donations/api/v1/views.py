@@ -17,10 +17,14 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.accounts.models.user import User
-from apps.donations.constants import DONATION_VERIFY_THROTTLE_SCOPE
+from apps.donations.constants import (
+    DONATION_VERIFY_THROTTLE_SCOPE,
+    VerifyErrorCode,
+)
 from apps.donations.models import DonationProduct
 from apps.donations.selectors import get_active_donation_products
 from apps.donations.services import (
+    PurchasePendingError,
     PurchaseVerificationError,
     StoreCommunicationError,
     UnknownDonationProductError,
@@ -34,6 +38,7 @@ from .serializers.purchase_serializer import PurchaseSerializer
 from .serializers.purchase_verify_request_serializer import (
     PurchaseVerifyRequestSerializer,
 )
+from .serializers.verify_error_serializer import VerifyErrorSerializer
 
 logger = logging.getLogger("donations")
 
@@ -49,7 +54,16 @@ class DonationProductListView(ListAPIView[DonationProduct]):
         return get_active_donation_products()
 
 
-@extend_schema(responses=PurchaseSerializer)
+@extend_schema(
+    request=PurchaseVerifyRequestSerializer,
+    responses={
+        status.HTTP_200_OK: PurchaseSerializer,
+        status.HTTP_400_BAD_REQUEST: VerifyErrorSerializer,
+        status.HTTP_409_CONFLICT: VerifyErrorSerializer,
+        status.HTTP_422_UNPROCESSABLE_ENTITY: VerifyErrorSerializer,
+        status.HTTP_502_BAD_GATEWAY: VerifyErrorSerializer,
+    },
+)
 class PurchaseVerifyView(APIView):
     """Verify a store purchase and record it.
 
@@ -87,17 +101,34 @@ class PurchaseVerifyView(APIView):
         except UnknownDonationProductError:
             logger.info("Rejected donation verify: unknown product_id")
             return Response(
-                {"detail": "Unknown product_id."}, status=status.HTTP_400_BAD_REQUEST
+                {
+                    "detail": "Unknown product_id.",
+                    "code": VerifyErrorCode.UNKNOWN_PRODUCT,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except PurchasePendingError as exc:
+            logger.info("Deferred donation verify: %s", exc)
+            return Response(
+                {
+                    "detail": "Purchase is pending payment, retry once it clears.",
+                    "code": VerifyErrorCode.PURCHASE_PENDING,
+                },
+                status=status.HTTP_409_CONFLICT,
             )
         except PurchaseVerificationError as exc:
             logger.info("Rejected donation verify: %s", exc)
             return Response(
-                {"detail": str(exc)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY
+                {"detail": str(exc), "code": VerifyErrorCode.PURCHASE_REJECTED},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
         except StoreCommunicationError as exc:
             logger.warning("Store unreachable during donation verify: %s", exc)
             return Response(
-                {"detail": "Store unavailable, please retry."},
+                {
+                    "detail": "Store unavailable, please retry.",
+                    "code": VerifyErrorCode.STORE_UNAVAILABLE,
+                },
                 status=status.HTTP_502_BAD_GATEWAY,
             )
 

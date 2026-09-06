@@ -24,9 +24,7 @@ def get_donation_product(product_id: str) -> DonationProduct | None:
     Deliberately not filtered by `is_active`: verifying or reconciling a
     purchase must keep working for a product staff have since retired, or a
     real payment already made against it can get silently auto-refunded by
-    the store while we wait on a retry that never comes. Callers that need
-    "is this still sellable" (e.g. `verify_and_record_purchase` when no prior
-    purchase exists) check `product.is_active` themselves; see
+    the store while we wait on a retry that never comes. See
     `get_active_donation_products` for "what can new buyers see".
 
     Args:
