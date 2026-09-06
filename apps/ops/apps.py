@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""App configuration for the metrics application."""
+"""App configuration for the ops application."""
 
 import time
 
@@ -10,12 +10,12 @@ from django.apps import AppConfig
 from django.conf import settings
 
 
-class MetricsConfig(AppConfig):
-    """Configuration class for the metrics Django app."""
+class OpsConfig(AppConfig):
+    """Configuration class for the ops Django app."""
 
     default_auto_field = "django.db.models.BigAutoField"
-    name = "apps.metrics"
-    verbose_name = "Prometheus Metrics"
+    name = "apps.ops"
+    verbose_name = "Operations"
 
     def ready(self) -> None:  # noqa: PLR6301
         """Initialize metrics when the app is ready.

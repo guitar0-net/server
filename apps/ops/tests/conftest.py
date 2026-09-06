@@ -18,8 +18,8 @@ def fresh_registry() -> Generator[None]:
     module to re-register all metrics. Use this fixture explicitly when you
     need test isolation for registry-related tests.
     """
-    from apps.metrics import metrics as metrics_module
-    from apps.metrics import registry
+    from apps.ops import metrics as metrics_module
+    from apps.ops import registry
 
     registry.reset_registry()
     importlib.reload(metrics_module)

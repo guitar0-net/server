@@ -2,13 +2,13 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""URL configuration for metrics app."""
+"""URL configuration for ops app."""
 
 from django.urls import path
 
 from .views import metrics_view
 
-app_name = "metrics"
+app_name = "ops"
 
 urlpatterns = [
     path("", metrics_view, name="prometheus"),
