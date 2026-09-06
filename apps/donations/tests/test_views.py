@@ -15,6 +15,7 @@ from apps.accounts.tests.factories.user import UserFactory
 from apps.donations.constants import Platform
 from apps.donations.models import Purchase
 from apps.donations.services import (
+    PurchasePendingError,
     PurchaseVerificationError,
     StoreCommunicationError,
     UnknownDonationProductError,
@@ -181,6 +182,72 @@ def test_purchase_verify_returns_422_for_a_rejected_purchase(
     )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.django_db
+def test_purchase_verify_returns_409_for_a_purchase_pending_payment(
+    api_client: APIClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def _raise(**_kwargs: object) -> None:
+        raise PurchasePendingError("платёж ещё не прошёл")
+
+    monkeypatch.setattr(
+        "apps.donations.api.v1.views.verify_and_record_purchase", _raise
+    )
+
+    response = api_client.post(
+        reverse("donation-verify"),
+        {
+            "platform": Platform.ANDROID,
+            "product_id": "спасибо",
+            "store_transaction_id": "GPA.tx-ожидание",
+            "purchase_token": "токен-ожидание",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_409_CONFLICT
+
+
+@pytest.mark.django_db
+def test_purchase_verify_accepts_an_android_request_without_a_transaction_id(
+    api_client: APIClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def _raise(**_kwargs: object) -> None:
+        raise PurchasePendingError("платёж ещё не прошёл")
+
+    monkeypatch.setattr(
+        "apps.donations.api.v1.views.verify_and_record_purchase", _raise
+    )
+
+    response = api_client.post(
+        reverse("donation-verify"),
+        {
+            "platform": Platform.ANDROID,
+            "product_id": "спасибо-без-заказа",
+            "purchase_token": "токен-без-заказа",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_409_CONFLICT
+
+
+@pytest.mark.django_db
+def test_purchase_verify_rejects_an_ios_request_without_a_transaction_id(
+    api_client: APIClient,
+) -> None:
+    response = api_client.post(
+        reverse("donation-verify"),
+        {
+            "platform": Platform.IOS,
+            "product_id": "спасибо-ios",
+            "signed_transaction_info": "jws-без-идентификатора",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db

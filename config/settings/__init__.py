@@ -114,6 +114,9 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
     "ENUM_GENERATE_CHOICE_DESCRIPTION": True,
+    "ENUM_NAME_OVERRIDES": {
+        "VerifyErrorCode": "apps.donations.constants.VerifyErrorCode",
+    },
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",
     ],
