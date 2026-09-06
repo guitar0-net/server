@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Integration tests for the metrics application."""
+"""Integration tests for the ops application."""
 
 import pytest
 from django.test import Client

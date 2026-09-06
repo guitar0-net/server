@@ -8,7 +8,7 @@ import pytest
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.test import RequestFactory
 
-from apps.metrics.middleware import PrometheusMiddleware
+from apps.ops.middleware import PrometheusMiddleware
 
 
 @pytest.fixture
@@ -67,7 +67,7 @@ def test_path_normalization_preserves_non_id_paths(
 def test_metrics_recording_increments_request_counter(
     middleware: PrometheusMiddleware, request_factory: RequestFactory
 ) -> None:
-    from apps.metrics.metrics import http_requests_total
+    from apps.ops.metrics import http_requests_total
 
     request = request_factory.get("/api/test/")
     middleware(request)
@@ -82,7 +82,7 @@ def test_metrics_recording_increments_request_counter(
 def test_metrics_recording_records_duration(
     middleware: PrometheusMiddleware, request_factory: RequestFactory
 ) -> None:
-    from apps.metrics.registry import get_registry
+    from apps.ops.registry import get_registry
 
     request = request_factory.get("/api/duration/")
     middleware(request)
@@ -102,7 +102,7 @@ def test_metrics_recording_records_duration(
 def test_metrics_recording_tracks_in_progress_requests(
     middleware: PrometheusMiddleware, request_factory: RequestFactory
 ) -> None:
-    from apps.metrics.metrics import http_requests_in_progress
+    from apps.ops.metrics import http_requests_in_progress
 
     initial_value = http_requests_in_progress.labels(
         method="GET", endpoint="/api/progress/"
@@ -212,7 +212,7 @@ def test_response_size_returns_zero_for_response_without_content() -> None:
 def test_exception_handling_records_exception_metric(
     request_factory: RequestFactory,
 ) -> None:
-    from apps.metrics.metrics import http_exceptions_total
+    from apps.ops.metrics import http_exceptions_total
 
     class CustomError(Exception):
         pass

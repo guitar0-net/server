@@ -15,7 +15,7 @@ from uuid import uuid4
 import pytest
 from prometheus_client import CollectorRegistry, Counter
 
-from apps.metrics.registry import (
+from apps.ops.registry import (
     build_exposition_registry,
     get_registry,
     reset_registry,
@@ -25,7 +25,7 @@ from apps.metrics.registry import (
 @pytest.fixture(autouse=True)
 def isolate_registry() -> Generator[None]:
     """Isolate each test by resetting registry before and after."""
-    from apps.metrics import metrics as metrics_module
+    from apps.ops import metrics as metrics_module
 
     reset_registry()
     importlib.reload(metrics_module)
@@ -97,7 +97,7 @@ def test_double_checked_locking_inner_check_returns_existing_registry() -> None:
     This covers the branch where a thread enters the lock
     but _registry is already set (by another thread).
     """
-    import apps.metrics.registry as registry_module
+    import apps.ops.registry as registry_module
 
     reset_registry()
 

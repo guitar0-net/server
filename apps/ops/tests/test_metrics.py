@@ -6,12 +6,12 @@
 
 from prometheus_client import REGISTRY
 
-from apps.metrics.constants import (
+from apps.ops.constants import (
     DURATION_BUCKETS,
     METRIC_PREFIX,
     SIZE_BUCKETS_BYTES,
 )
-from apps.metrics.registry import get_registry
+from apps.ops.registry import get_registry
 
 
 def test_duration_buckets_cover_reasonable_range() -> None:

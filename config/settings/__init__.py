@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "markdownx",
     "drf_spectacular",
     "drf_spectacular_sidecar",
-    "apps.metrics",
+    "apps.ops",
     "apps.accounts",
     "apps.chords",
     "apps.schemes",
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "apps.metrics.middleware.PrometheusMiddleware",
+    "apps.ops.middleware.PrometheusMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
