@@ -83,7 +83,7 @@ apps/
   lessons/        lessons
   songs/          song library
   schemes/        fretboard schemes
-  metrics/        Prometheus metrics endpoint
+  ops/            metrics, health and readiness endpoints
 config/           Django settings and URL routing
 infrastructure/   Docker, Ansible, observability
 ```
