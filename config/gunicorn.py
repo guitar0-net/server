@@ -6,6 +6,23 @@
 
 import multiprocessing
 import os
+import shutil
+from pathlib import Path
+from typing import Protocol
+
+
+class _Worker(Protocol):
+    """The part of a gunicorn worker object the hooks below touch."""
+
+    pid: int
+
+
+# Wiped on boot: prometheus_client never expires these files, so values from
+# a previous run would be summed into the new ones.
+PROMETHEUS_MULTIPROC_DIR = os.getenv("PROMETHEUS_MULTIPROC_DIR")
+if PROMETHEUS_MULTIPROC_DIR:
+    shutil.rmtree(PROMETHEUS_MULTIPROC_DIR, ignore_errors=True)
+    Path(PROMETHEUS_MULTIPROC_DIR).mkdir(parents=True, exist_ok=True)
 
 # Bind to all interfaces on port 8000
 bind = "0.0.0.0:8000"
@@ -17,9 +34,10 @@ worker_class = "sync"
 timeout = 30
 keepalive = 2
 
-# Restart workers after this many requests (prevents memory leaks)
-max_requests = 1000
-max_requests_jitter = 50
+worker_tmp_dir = "/dev/shm"
+
+# Recycling off: every worker pid leaves mmap files that are never reclaimed.
+max_requests = 0
 
 # Logging
 accesslog = "-"  # stdout
@@ -30,11 +48,25 @@ access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
 # Put the level first so the error/boot log lines match the same
 # `{levelname} {message}` shape as Django's console formatter — the log
 # pipeline (Grafana Alloy) detects level by matching the start of the line.
+#
+# "loggers" replaces gunicorn's default mapping wholesale, so both are listed.
 logconfig_dict = {
     "formatters": {
         "generic": {
             "format": "{levelname} {asctime} [{process}] {message}",
             "style": "{",
+        },
+    },
+    "loggers": {
+        "gunicorn.error": {
+            "level": "INFO",
+            "handlers": ["error_console"],
+            "propagate": False,
+        },
+        "gunicorn.access": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
         },
     },
 }
@@ -52,3 +84,20 @@ preload_app = True
 limit_request_line = 4094
 limit_request_fields = 100
 limit_request_field_size = 8190
+
+
+def child_exit(server: object, worker: _Worker) -> None:
+    """Release the exiting worker's Prometheus gauge files.
+
+    Without it a dead worker keeps contributing to `livesum` aggregates.
+
+    Args:
+        server: The gunicorn arbiter that reaped the worker.
+        worker: The worker that has just exited.
+    """
+    if not PROMETHEUS_MULTIPROC_DIR:
+        return
+
+    from prometheus_client import multiprocess  # noqa: PLC0415
+
+    multiprocess.mark_process_dead(worker.pid)

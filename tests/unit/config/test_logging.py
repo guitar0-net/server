@@ -90,3 +90,27 @@ def test_get_logging_config_prod(mock_settings: Settings) -> None:
     mock_settings.ENVIRONMENT = "production"
     config = get_logging_config(mock_settings)
     assert config["loggers"]["accounts"]["level"] == "INFO"
+
+
+def test_logging_config_drops_the_file_handler_outside_development(
+    mock_settings: Settings,
+) -> None:
+    mock_settings.ENVIRONMENT = "production"
+    assert "file" not in get_logging_config(mock_settings)["handlers"]
+
+
+def test_logging_config_keeps_the_root_logger_on_console_alone_on_staging(
+    mock_settings: Settings,
+) -> None:
+    mock_settings.ENVIRONMENT = "staging"
+    assert get_logging_config(mock_settings)["loggers"][""]["handlers"] == ["console"]
+
+
+def test_logging_config_still_mails_admins_when_the_file_handler_is_gone(
+    mock_settings: Settings,
+) -> None:
+    mock_settings.ENVIRONMENT = "production"
+    assert (
+        "mail_admins"
+        in get_logging_config(mock_settings)["loggers"]["django"]["handlers"]
+    )

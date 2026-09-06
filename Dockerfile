@@ -86,8 +86,5 @@ USER appuser
 # Expose port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/metrics/ || exit 1
 
 CMD ["gunicorn", "--config", "config/gunicorn.py", "config.wsgi:application"]

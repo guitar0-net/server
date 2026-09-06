@@ -31,6 +31,7 @@ http_requests_in_progress = Gauge(
     documentation="Number of HTTP requests currently in progress.",
     labelnames=["method", "endpoint"],
     registry=get_registry(),
+    multiprocess_mode="livesum",
 )
 
 http_exceptions_total = Counter(
@@ -63,10 +64,12 @@ app_info = Gauge(
     documentation="Application information.",
     labelnames=["version", "git_sha", "build_datetime"],
     registry=get_registry(),
+    multiprocess_mode="max",
 )
 
 app_startup_timestamp_seconds = Gauge(
     name=f"{METRIC_PREFIX}app_startup_timestamp_seconds",
     documentation="Application startup time (unix timestamp).",
     registry=get_registry(),
+    multiprocess_mode="max",
 )
